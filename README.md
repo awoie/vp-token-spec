@@ -2,6 +2,14 @@
 
 This specification defines the additional OpenID Connect authentication response parameter `vp_token`. The new parameter allows OpenID Connect OPs to provide RPs with End-User claims as Verifiable Presentations or Verifiable Credentials in addition to claims provided in the`id_token` and/or via Userinfo responses.
 
+# Authors
+
+- Oliver Terbu (ConsenSys Mesh)
+- Torsten Lodderstedt (yes.com)
+- Kristina Yasuda (Microsoft)
+- Adam Lemmon (Trybe.ID)
+- Tobias Looker (Mattr)
+
 # Abstract
 Notes:
 - this should really start with the explanation of the role signatures play in VCs (can be both JSON or JSON-LD) and that there are two widely used proof types (JWTs and LD-proofs)
