@@ -36,8 +36,8 @@ The following is a non-normative example of a W3C VC using the external [JWT pro
 
 ```json
 {
-  "iss": "did:example:cdcdcdcdcdcdcdcdcdcdcdcdcdc",
-  "sub": "did:example:abababababababababababababa",
+  "iss": "did:example:issuer",
+  "sub": "did:example:holder",
   "jti": "http://example.edu/credentials/3732",
   "nbf": 1541493724,
   "iat": 1541493724,
