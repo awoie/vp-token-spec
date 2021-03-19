@@ -1,8 +1,10 @@
-# vp_token response parameter for OpenID Connect
+# OpenID Connect vp_token response parameter extension 
 
-This specification defines the additional OpenID Connect authentication response parameter `vp_token`. The new parameter allows OpenID Connect OPs to provide RPs with End-User claims as Verifiable Presentations or Verifiable Credentials in addition to claims provided in the`id_token` and/or via Userinfo responses.
+## Abstract
 
-# Authors
+This specification defines the additional OpenID Connect authentication response parameter `vp_token`. The new parameter allows OpenID Connect OPs to provide RPs with End-User claims as W3C Verifiable Presentations or W3C Verifiable Credentials in addition to claims provided in the`id_token` and/or via Userinfo responses.
+
+## Authors
 
 - Oliver Terbu (ConsenSys Mesh)
 - Torsten Lodderstedt (yes.com)
@@ -10,12 +12,13 @@ This specification defines the additional OpenID Connect authentication response
 - Adam Lemmon (Trybe.ID)
 - Tobias Looker (Mattr)
 
-# Abstract
+## Introduction
+
 Notes:
 - this should really start with the explanation of the role signatures play in VCs (can be both JSON or JSON-LD) and that there are two widely used proof types (JWTs and LD-proofs)
 - Explain why is there a need for this extension?
 
-# Overview
+## Overview
 - RP requests `vp_token` by adding scope value `vp_token` to the OpenID Connect authentication request. 
 - Content of the `vp_token` is determined by using an additional destination in the `claims` request parameter. 
 - Authentication event information is conveyed via the id token while it's up to the RP to determine what (additional) claims are allocated to id_token and vp_token, respectively.
@@ -26,6 +29,149 @@ Notes:
 OPTIONAL. Hash value of `vp_token` that represents the W3C VP. Its value is the base64url encoding of the left-most half of the hash of the octets of the ASCII representation of the vp_token value, where the hash algorithm used is the hash algorithm used in the alg Header Parameter of the ID Token's JOSE Header. For instance, if the alg is RS256, hash the vp_token value with SHA-256, then take the left-most 128 bits and base64url encode them. The vp_hash value is a case sensitive string.
 
 # Examples
+
+## W3C Verifiable Credential using external JWT proofs
+
+The following is a non-normative example of a W3C VC using the external [JWT proof format](https://www.w3.org/TR/vc-data-model/#json-web-token), i.e., standard W3C VC encoded as a JWT (base64url decoded JWT payload only):
+
+```json
+{
+  "iss": "did:example:cdcdcdcdcdcdcdcdcdcdcdcdcdc",
+  "sub": "did:example:abababababababababababababa",
+  "jti": "http://example.edu/credentials/3732",
+  "nbf": 1541493724,
+  "iat": 1541493724,
+  "exp": 1573029723,
+  "vc": {
+    "@context": [
+      "https://www.w3.org/2018/credentials/v1",
+      "https://www.w3.org/2018/credentials/examples/v1"
+    ],
+    "type": [
+      "VerifiableCredential",
+      "UniversityDegreeCredential"
+    ],
+    "credentialSubject": {
+      "degree": {
+        "type": "BachelorDegree",
+        "name": "Bachelor of Computer Science"
+      }
+    }
+  }
+}
+```
+
+## W3C Verifiable Credential using internal proofs
+
+The following is a non-normative example of a W3C VC using the internal proof format. The proof property contains a JSON-LD Proof and uses the detached JWS encoding for the signature representation:
+
+```json
+{
+  "@context": [
+    "https://www.w3.org/2018/credentials/v1",
+    "https://www.w3.org/2018/credentials/examples/v1"
+  ],
+  "id": "https://example.com/credentials/1872",
+  "type": [
+    "VerifiableCredential",
+    "AlumniCredential"
+  ],
+  "issuer": {
+    "id": "did:example:issuer"
+  },
+  "issuanceDate": "2010-01-01T19:23:24Z",
+  "credentialSubject": {
+    "id": "did:example:holder",
+    "alumniOf": "Example University"
+  },
+  "proof": {
+    "type": "Ed25519Signature2018",
+    "created": "2021-03-19T15:30:15Z",
+    "jws": "eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..PT8yCqVjj5ZHD0W36zsBQ47oc3El07WGPWaLUuBTOT48IgKI5HDoiFUt9idChT_Zh5s8cF_2cSRWELuD8JQdBw",
+    "proofPurpose": "assertionMethod",
+    "verificationMethod": "did:example:issuer#keys-1"
+  }
+}
+```
+
+## W3C Verifiable Presentation using external JWT proofs
+
+The following is a non-normative example of a W3C VP using the external [JWT proof format](https://www.w3.org/TR/vc-data-model/#json-web-token), i.e., standard W3C VP encoded as a JWT (base64url decoded JWT payload only):
+
+```json
+{
+  "iss": "did:example:issuer",
+  "sub": "did:example:holder",
+  "jti": "http://example.edu/credentials/3732",
+  "nbf": 1541493724,
+  "iat": 1541493724,
+  "exp": 1573029723,
+  "nonce": "=§§@34fdfd3!",
+  "vp": {
+    "@context": [
+      "https://www.w3.org/2018/credentials/v1",
+      "https://www.w3.org/2018/credentials/examples/v1"
+    ],
+    "type": [
+      "VerifiablePresentation",
+    ],
+    "verifiableCredential": [ "eyJhbGc..." ]
+  }
+}
+```
+
+## W3C Verifiable Presentation using internal proof
+The following is a non-normative example of a W3C VP using the internal proof format. The proof property contains a JSON-LD Proof and uses the detached JWS encoding for the signature representation:
+
+```json
+{
+  "@context": [
+    "https://www.w3.org/2018/credentials/v1"
+  ],
+  "type": [
+    "VerifiablePresentation"
+  ],
+  "verifiableCredential": [
+    {
+      "@context": [
+        "https://www.w3.org/2018/credentials/v1",
+        "https://www.w3.org/2018/credentials/examples/v1"
+      ],
+      "id": "https://example.com/credentials/1872",
+      "type": [
+        "VerifiableCredential",
+        "AlumniCredential"
+      ],
+      "issuer": {
+        "id": "did:example:issuer"
+      },
+      "issuanceDate": "2010-01-01T19:23:24Z",
+      "credentialSubject": {
+        "id": "did:example:holder",
+        "alumniOf": "Example University"
+      },
+      "proof": {
+        "type": "Ed25519Signature2018",
+        "created": "2021-03-19T15:30:15Z",
+        "jws": "eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..PT8yCqVjj5ZHD0W36zsBQ47oc3El07WGPWaLUuBTOT48IgKI5HDoiFUt9idChT_Zh5s8cF_2cSRWELuD8JQdBw",
+        "proofPurpose": "assertionMethod",
+        "verificationMethod": "did:example:issuer#keys-1"
+      }
+    }
+  ],
+  "id": "ebc6f1c2",
+  "holder": "did:example:holder",
+  "proof": {
+    "type": "Ed25519Signature2018",
+    "created": "2021-03-19T15:30:15Z",
+    "challenge": "()&)()0__sdf",
+    "jws": "eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..GF5Z6TamgNE8QjE3RbiDOj3n_t25_1K7NVWMUASe_OEzQV63GaKdu235MCS3hIYvepcNdQ_ZOKpGNCf0vIAoDA",
+    "proofPurpose": "authentication",
+    "verificationMethod": "did:example:holder#key-1"
+  }
+}
+```
+
 ## SIOP
 request with new scope `vp_token`
 
