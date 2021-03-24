@@ -66,7 +66,7 @@ In its simplest form, the RP just asks the OP to provide a VP or VC containing a
 
 ### claims parameter (with identity assurance requirements)
 
-The TP may also request claims fulfilling the requirtements of a certain trust framework and identity assurance level. It does so by adding a `verified_claims` claims element to the `vp_token` section, which defines the verification requirements and lists the respective End-User claims. 
+The RP may also request claims fulfilling the requirtements of a certain trust framework and identity assurance level. It does so by adding a `verified_claims` claims element to the `vp_token` section, which defines the verification requirements and lists the respective End-User claims. 
 Note: this syntax was adopted from the OpenID Connect for Identity Assurance spec (https://openid.net/specs/openid-connect-4-identity-assurance-1_0.html).
 
 ```
@@ -183,6 +183,10 @@ In this case the OP released a credential compatible with the eIDAS trust framew
       "VerifiableCredential",
       "IDCardredential"
     ],
+    "issuer":{
+      "name":"Skatteverket",
+      "country":"SE"
+    }
     "credentialSubject": {
       "given_name": "Fredrik",
       "family_name": "Strömberg",
@@ -195,9 +199,6 @@ In this case the OP released a credential compatible with the eIDAS trust framew
       "number": "4901224131",
       "date_of_issuance":"2010-03-23",
       "date_of_expiry":"2020-03-22"
-      "issuer":{
-        "name":"Skatteverket",
-        "country":"SE"
     }
   }
 }
@@ -221,7 +222,9 @@ In this case the OP released a credential compatible with the eIDAS trust framew
     "IDCardredential"
   ],
   "issuer": {
-    "id": "did:example:issuer"
+    "id": "did:example:issuer",
+    "name":"Skatteverket",
+    "country":"SE"
   },
   "issuanceDate": "2010-01-01T19:23:24Z",
   "credentialSubject": {
@@ -236,9 +239,6 @@ In this case the OP released a credential compatible with the eIDAS trust framew
     "number": "4901224131",
     "date_of_issuance":"2010-03-23",
     "date_of_expiry":"2020-03-22"
-    "issuer":{
-      "name":"Skatteverket",
-      "country":"SE"
   },
   "proof": {
     "type": "Ed25519Signature2018",
