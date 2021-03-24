@@ -19,8 +19,7 @@ Notes:
 - Explain why is there a need for this extension?
 
 ## Overview
-- RP requests `vp_token` by adding scope value `vp_token` to the OpenID Connect authentication request. 
-- Content of the `vp_token` is determined by using an additional destination in the `claims` request parameter. 
+- RP requests `vp_token` by adding an additional destination `vp_token` in the `claims` request parameter. 
 - Authentication event information is conveyed via the id token while it's up to the RP to determine what (additional) claims are allocated to id_token and vp_token, respectively.
 - `vp_token` is provided in the same response as the `id_token`. Depending on the response type, this can be either the authentication response or the token response. 
 - If the vp_token is returned in the frontchannel, a hash (`vp_hash`) of `vp_token` must be included in `id_token`.
@@ -183,7 +182,7 @@ to request claims in the `vp_token`:
     response_type=id_token
     &client_id=https%3A%2F%2Fclient.example.org%2Fcb
     &redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb
-    &scope=openid%20vp_token
+    &scope=openid
     &claims=...
     &state=af0ifjsldkj
     &nonce=n-0S6_WzA2Mj
@@ -251,7 +250,7 @@ Authentication Request
     response_type=code
     &client_id=s6BhdRkqt3 
     &redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb
-    &scope=openid%20vp_token
+    &scope=openid
     &claims=...
     &state=af0ifjsldkj
     &nonce=n-0S6_WzA2Mj HTTP/1.1
