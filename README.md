@@ -107,6 +107,59 @@ The successful authentication response contains a `vp_token` parameter along wit
 
 For the potential content of the vp_token parameter see (#vp_token_content).
 
+# Front channel using the id_token as the vp_token
+This section illustrates the protocol flow for the case of communication through the front channel only (like in SIOP) where the `id_token` is used as the `vp_token`. In this section there is no new `vp_token` artifact.
+
+Note that this flow currently only supports JWT based Verifiable Presentations.
+
+## Authentication request
+
+The following is a non-normative example of how an RP would use the `claims` parameter to request the `vp` claim in the `id_token`:
+
+```
+  HTTP/1.1 302 Found
+  Location: openid://?
+    response_type=id_token
+    &client_id=https%3A%2F%2Fclient.example.org%2Fcb
+    &redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb
+    &scope=openid
+    &claims=...
+    &state=af0ifjsldkj
+    &nonce=n-0S6_WzA2Mj
+    &registration_uri=https%3A%2F%2F
+      client.example.org%2Frf.txt%22%7D
+      
+```
+### claims parameter (simple)
+
+In its simplest form, the RP just asks the OP to provide a VP or VC containing a set of claims in the response by listing those claims underneath `id_token.vp`.  
+
+```
+{
+    "id_token": {
+      "vp": {
+        "given_name": null,
+        "family_name": null,
+        "birthdate": null
+      } 
+    },
+}
+```
+
+## Authentication Response 
+
+The successful authentication response contains an `id_token` and `state`.
+```
+  HTTP/1.1 302 Found
+  Location: https://client.example.org/cb#
+    id_token=...
+    &state=af0ifjsldkj
+      
+```
+
+For the potential content of the `id_token` parameter see (#W3C Verifiable Presentation using external JWT proofs).
+
+
 # Standard OpenID Connect (backchannel)
 
 This section illustrates the protocol flow for the case of communication using frontchannel and backchannel (utilizing the authorization code flow).
@@ -333,7 +386,6 @@ In this case the OP selectively disclosed claims from a credential compatible wi
 
 # Alternatives
 - embedded VC as JWT: https://hackmd.io/wljYjkzfTmKVW0bX91o_Iw?view
-- embedded VP in JSON-LD format: https://hackmd.io/B2YfyQp-SJ-WdPu1oJo1Ww
 
 # Design Considerations
 The design choosen has the following advantages:
