@@ -179,11 +179,22 @@ OPTIONAL. Hash value of `vp_token` that represents the W3C VP. Its value is the 
 `vc_hash`
 OPTIONAL. Hash value of `vc_token` that represents the W3C VC. Its value is the base64url encoding of the left-most half of the hash of the octets of the ASCII representation of the `vc_token` value, where the hash algorithm used is the hash algorithm used in the alg Header Parameter of the ID Token's JOSE Header. For instance, if the alg is RS256, hash the `vc_token` value with SHA-256, then take the left-most 128 bits and base64url encode them. The `vc_hash` value is a case sensitive string.
 
-# Request Examples
-## Front channel with vp in id_token
-This section illustrates the protocol flow for the case of communication through the front channel only (like in SIOP) where the `id_token` is a Verifiable Presentation as well. 
+## Combinations
 
-## Authentication request
+This table shows the different compinations of OpenID Connect Flows, VC/VP representations and how the binding of the VC or VP with the subject is validated by the RP.
+
+| OpenID Connect Flow | ID Token Signer | `vc` claim in ID Token | `vp` claim in ID Token | `vc_token` | `vp_token` 
+|:--------------------|:----------------|:---------------|:---------------|:---------|:--------------------------|
+| SIOP                | Holder          | bearer credential or same did in `sub` and credential | vp signed by holder | bearer credential or `vc_hash` + same did in `sub` and credential | VP signed by subject + `vp_hash` 
+| Standard (e.g. code)| OP              | bearer credential or `sub_ast` signed by holder + same did in `sub` and credential| bearer credential or `sub_ast` signed by holder + same did in `sub` and credential[does this make sense? it does not comply with w3c vc spec]| bearer credential or `vc_hash` + `sub_ast` signed by holder + same did in `sub` and credential | VP signed by subject + `vp_hash`
+
+NOTE: `sub_ast` is defined in https://github.com/mattrglobal/oidc-portable-identities.
+
+# Request Examples
+## SIOP with ID Token as VP
+This section illustrates the protocol flow for the case of communication through the front channel only (SIOP) where the `id_token` is a Verifiable Presentation as well. 
+
+### Authentication request
 
 The following is a non-normative example of how an RP would use the `claims` parameter to request the `vp` claim in the `id_token`:
 
@@ -194,28 +205,30 @@ The following is a non-normative example of how an RP would use the `claims` par
     &client_id=https%3A%2F%2Fclient.example.org%2Fcb
     &redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb
     &scope=openid
-    &claims=...
+    &claims=claims=%7B%22id_token%22%3A%7B%22vc%22%3A%7B%22types%22%3A%5B%22https%3A%2F%
+     2Fdid.itsourweb.org%3A3000%2Fsmart-credential%2FOntario-Health-Insurance-Plan
+     %22%5D%7D%7D%7D
     &state=af0ifjsldkj
-    &nonce=n-0S6_WzA2Mj
+    &nonce=960848874
     &registration_uri=https%3A%2F%2F
       client.example.org%2Frf.txt%22%7D
       
 ```
-### claims parameter
+#### claims parameter
 
 In this case, the RP asks the OP to provide a VC of a certain type.  
 
 ```
 {
     "id_token": {
-      "vc": {
-        "credential_types": ["https://www.w3.org/2018/credentials/examples/v1/IDCardredential"]
+      "vp": {
+        "credential_types": ["https://did.itsourweb.org:3000/smartcredential/Ontario-Health-Insurance-Plan"]
       } 
     }
 }
 ```
 
-## Authentication Response 
+### Authentication Response 
 
 The successful authentication response contains an `id_token` and `state`.
 ```
@@ -225,51 +238,97 @@ The successful authentication response contains an `id_token` and `state`.
     &state=af0ifjsldkj
       
 ```
+### Verifiable Presentation
 
-## Verifiable Presentation
-
-The ID Token contains a `vc` element with the Verifiable Credential data. 
+The ID Token contains a `vp` element with the Verifiable Credential data. 
 
 ```json
 {
-  "iss": "did:example:issuer",
-  "sub": "did:example:holder",
-  "jti": "http://example.edu/credentials/3732",
-  "nbf": 1541493724,
-  "iat": 1541493724,
-  "exp": 1573029723,
-  "vc": {
-    "@context": [
-      "https://www.w3.org/2018/credentials/v1",
-      "https://www.w3.org/2018/credentials/examples/v1"
-    ],
-    "type": [
-      "VerifiableCredential",
-      "IDCardredential"
-    ],
-    "issuer":{
-      "name":"Skatteverket",
-      "country":"SE"
-    }
-    "credentialSubject": {
-      "given_name": "Fredrik",
-      "family_name": "Strömberg",
-      "birthdate": "1949-01-22",
-      "place_of_birth": {
-        "country": "SE",
-        "locality": "Örnsköldsvik"
-      },
-      "nationality": "SE",
-      "number": "4901224131",
-      "date_of_issuance":"2010-03-23",
-      "date_of_expiry":"2020-03-22"
-    }
-  }
+   "iss":"https://book.itsourweb.org:3000/wallet/wallet.html",
+   "aud":"https://book.itsourweb.org:3000/client_api/authresp/uhn",
+   "iat":1615910538,
+   "exp":1615911138,
+   "sub":"urn:uuid:68f874e2-377c-437f-a447-b304967ca351",
+   "auth_time":1615910535,
+   "vp":{
+      "@context":[
+         "https://www.w3.org/2018/credentials/v1",
+         "https://ohip.ontario.ca/v1"
+      ],
+      "type":[
+         "VerifiablePresentation"
+      ],
+      "verifiableCredential":[
+         "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6InVybjp1dWlkOjU0ZDk2NjE2LTE1MWUt
+          NDkyOC04NTljLWMzMzE5YTQxODg1YyJ9.eyJzdWIiOiJ1cm46dXVpZDo2OGY4NzRlMi0zNzdjLTQz
+          N2YtYTQ0Ny1iMzA0OTY3Y2EzNTEiLCJpc3MiOiJodHRwczovL2Jvb2suaXRzb3Vyd2ViLm9yZzozM
+          DAwL29oaXAiLCJpYXQiOjE2MTU5MTAxNTUsImV4cCI6MTYxNjA4Mjk1NSwiYXVkIjoiaHR0cHM6Ly
+          9ib29rLml0c291cndlYi5vcmc6MzAwMC93YWxsZXQvd2FsbGV0Lmh0bWwiLCJqdGkiOiJ1cm46dXV
+          pZDo3ZmU5MThmMC1jMTcyLTQzNGMtOWQ5Yi0zZDIxZDQ1YjNlNjIiLCJ2YyI6eyJAb3B0aW9ucyI6
+          WyJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy92MSIsImh0dHBzOi8vb2hpcC5vb
+          nRhcmlvLmNhL3YxIl0sInR5cGUiOlsiVmVyaWZpYWJsZUNyZWRlbnRpYWwiLCJodHRwczovL2RpZC
+          5pdHNvdXJ3ZWIub3JnOjMwMDAvc21hcnQtY3JlZGVudGlhbC9PbnRhcmlvLUhlYWx0aC1JbnN1cmF
+          uY2UtUGxhbiJdLCJkZXNjcmlwdGlvbiI6Ik9ISVAgc3RhdHVzIiwiY3JlZGVudGlhbFN1YmplY3Qi
+          OnsiaGVhbHRoTnVtYmVyIjoiMTEyMjMzNDQ1NSIsInZlcnNpb25OdW1iZXIiOiJOViIsImRhdGVPZ
+          kJpcnRoIjoiMTk5NS8wNy8xMCIsImZpcnN0TmFtZSI6IkphbmUiLCJsYXN0TmFtZSI6IkRvZSIsIn
+          Bvc3RhbENvZGUiOiJNNkgzQjMiLCJzdGF0dXMiOiJPSyJ9fX0.dFXuhMzZMU15aN1gdrhDDl9ENrJ
+          jC1fXYPj4yOhqKgkVBzLBQZe5EfLCqo2CkhPirC7wqFPedqGC5MsaCNIqBAlsrzSm7bbpoj-73-_3
+          x6iEKvc8zOLZlHIVN4S9tl_H2HztYBv8GGuu2fvPdKzMRwdsxIV0Q-KDUEJQqX902TEFXqcffEFWp
+          1DJ3KFpFCNHsmf_mDztjqUZJtsBr5aMzxYypu9br5irBGS039USzFMvdVPLoZSCmR-HZqufbKnoih
+          dqwQaVxWU-o4fmQVx7_kmz7e9npe2TvlhMAmwOutBUhoUZAyjxpiiJEim5qnI2rD0KRw-i9qO6Dr9
+          OLryT1g"    
+      ]
+   },
+   "nonce":"960848874",
+   "sub_jwk":{
+      "crv":"P-384",
+      "ext":true,
+      "key_ops":[
+         "verify"
+      ],
+      "kty":"EC",
+      "x":"jf3a6dquclZ4PJ0JMU8RuucG9T1O3hpU_S_79sHQi7VZBD9e2VKXPts9lUjaytBm",
+      "y":"38VlVE3kNiMEjklFe4Wo4DqdTKkFbK6QrmZf77lCMN2x9bENZoGF2EYFiBsOsnq0"
+   }
 }
 ```
 
-## Frontchannel with vp_token
+The `vp` element in turn contains the underlying VC in the `verifiableCredential` element, which decodes to
+
+```json
+{
+   "sub":"urn:uuid:68f874e2-377c-437f-a447-b304967ca351",
+   "iss":"https://book.itsourweb.org:3000/ohip",
+   "iat":1615910155,
+   "exp":1616082955,
+   "aud":"https://book.itsourweb.org:3000/wallet/wallet.html",
+   "jti":"urn:uuid:7fe918f0-c172-434c-9d9b-3d21d45b3e62",
+   "vc":{
+      "@context":[
+         "https://www.w3.org/2018/credentials/v1",
+         "https://ohip.ontario.ca/v1"
+      ],
+      "type":[
+         "VerifiableCredential",
+         "https://did.itsourweb.org:3000/smart-credential/Ontario-Health-Insurance-Plan"
+      ],
+      "description":"OHIP status",
+      "credentialSubject":{
+         "healthNumber":"1122334455",
+         "versionNumber":"NV",
+         "dateOfBirth":"1995/07/10",
+         "firstName":"Jane",
+         "lastName":"Doe",
+         "postalCode":"M6H3B3",
+         "status":"OK"
+      }
+   }
+}
+```
+
+## SIOP with vp_token
 This section illustrates the protocol flow for the case of communication through the front channel only (like in SIOP).
+
 ### Authentication request
 
 The following is a non-normative example of how an RP would use the `claims` parameter to request claims in the `vp_token`:
@@ -289,9 +348,9 @@ The following is a non-normative example of how an RP would use the `claims` par
       
 ```
 
-### claims parameter
+#### claims parameter
 
-```
+```json
 {
     "id_token": {
         "acr": null
@@ -308,7 +367,7 @@ The following is a non-normative example of how an RP would use the `claims` par
 }
 ```
 
-## Authentication Response 
+### Authentication Response 
 
 The successful authentication response contains a `vp_token` parameter along with  `id_token` and `state`.
 ```
@@ -319,6 +378,10 @@ The successful authentication response contains a `vp_token` parameter along wit
     &state=af0ifjsldkj
       
 ```
+
+#### id_token
+
+`vp_hash`
 
 ### vp_token content
 
