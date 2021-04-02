@@ -1,4 +1,4 @@
-# OpenID Connect for Verifiable Credentials presentation
+# OpenID Connect for Verifiable Credential presentation
 
 ## Abstract
 
