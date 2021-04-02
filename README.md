@@ -540,9 +540,9 @@ HTTP/1.1 302 Found
 
 The VP token content is the same as in the SIOP vp_token example. 
 
-# vp_token encoding options
+# vc_token encoding options
 
-## W3C Verifiable Credential using external JWT proofs
+## W3C Verifiable Credential in JWT format using external JWT proof
 
 The following is a non-normative example of a W3C VC using the external [JWT proof format](https://www.w3.org/TR/vc-data-model/#json-web-token), i.e., standard W3C VC encoded as a JWT (base64url decoded JWT payload only). 
 
@@ -583,7 +583,7 @@ In this case the OP released a credential compatible with the eIDAS trust framew
 }
 ```
 
-## W3C Verifiable Credential using internal proofs
+## W3C Verifiable Credential in JSON-LD format using internal proof
 
 The following is a non-normative example of a W3C VC using the internal proof format. The proof property contains a JSON-LD Proof and uses the detached JWS encoding for the signature representation.
 
@@ -629,7 +629,9 @@ In this case the OP released a credential compatible with the eIDAS trust framew
 }
 ```
 
-## W3C Verifiable Presentation using external JWT proofs
+# vc_token encoding options
+
+## W3C Verifiable Presentation in JWT format using external JWT proof
 
 The following is a non-normative example of a W3C VP using the external [JWT proof format](https://www.w3.org/TR/vc-data-model/#json-web-token), i.e., standard W3C VP encoded as a JWT (base64url decoded JWT payload only):
 
@@ -655,7 +657,7 @@ The following is a non-normative example of a W3C VP using the external [JWT pro
 }
 ```
 
-## W3C Verifiable Presentation using internal proof
+## W3C Verifiable Presentation in JSON-LD format using internal proof
 The following is a non-normative example of a W3C VP using the internal proof format. The proof property contains a JSON-LD Proof and uses the detached JWS encoding for the signature representation.
 
 In this case the OP selectively disclosed claims from a credential compatible with the eIDAS trust framework as requested by the RP (a swedish id card). 
