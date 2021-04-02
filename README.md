@@ -352,9 +352,6 @@ The following is a non-normative example of how an RP would use the `claims` par
 
 ```json
 {
-    "id_token": {
-        "acr": null
-    },
     "vp_token": {
       "format": "json-ld",
       "claims":
@@ -381,9 +378,32 @@ The successful authentication response contains a `vp_token` parameter along wit
 
 #### id_token
 
-`vp_hash`
+This example shown an ID Token containing a `vp_hash`:
 
-### vp_token content
+```json
+{
+   "iss":"https://book.itsourweb.org:3000/wallet/wallet.html",
+   "aud":"https://book.itsourweb.org:3000/client_api/authresp/uhn",
+   "iat":1615910538,
+   "exp":1615911138,
+   "sub":"urn:uuid:68f874e2-377c-437f-a447-b304967ca351",
+   "auth_time":1615910535,
+   "vp_hash":"77QmUPtjPfzWtF2AnpK9RQ",
+   "nonce":"960848874",
+   "sub_jwk":{
+      "crv":"P-384",
+      "ext":true,
+      "key_ops":[
+         "verify"
+      ],
+      "kty":"EC",
+      "x":"jf3a6dquclZ4PJ0JMU8RuucG9T1O3hpU_S_79sHQi7VZBD9e2VKXPts9lUjaytBm",
+      "y":"38VlVE3kNiMEjklFe4Wo4DqdTKkFbK6QrmZf77lCMN2x9bENZoGF2EYFiBsOsnq0"
+   }
+}
+```
+
+#### vp_token content
 
 ```json
 {
@@ -435,11 +455,11 @@ The successful authentication response contains a `vp_token` parameter along wit
 }
 ```
 
-# Standard OpenID Connect (backchannel)
+## Standard OpenID Connect (backchannel)
 
 This section illustrates the protocol flow for the case of communication using frontchannel and backchannel (utilizing the authorization code flow).
 
-## Authentication Request
+### Authentication Request
 
 ```
   GET /authorize?
@@ -453,7 +473,23 @@ This section illustrates the protocol flow for the case of communication using f
   Host: server.example.com
 ```
 
-## Authentication Response
+#### Claims parameter
+
+```json
+{
+    "vp_token": {
+      "format": "json-ld",
+      "claims":
+      {
+        "given_name": null,
+        "family_name": null,
+        "birthdate": null
+      }
+    }
+}
+```
+
+### Authentication Response
 ```
 HTTP/1.1 302 Found
   Location: https://client.example.org/cb?
@@ -461,7 +497,7 @@ HTTP/1.1 302 Found
     &state=af0ifjsldkj
 ```
 
-## Token Request
+### Token Request
 ```
   POST /token HTTP/1.1
   Host: server.example.com
@@ -473,7 +509,7 @@ HTTP/1.1 302 Found
   &redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb
 ```
 
-## Token Response
+### Token Response
 
 ```
 {
@@ -485,6 +521,24 @@ HTTP/1.1 302 Found
    "vp_token": "wl93lqt7_R...Cf0h"
   }
 ```
+
+#### id_token
+
+```json
+{
+  "iss": "http://server.example.com",
+  "sub": "248289761001",
+  "aud": "s6BhdRkqt3",
+  "nonce": "n-0S6_WzA2Mj",
+  "exp": 1311281970,
+  "iat": 1311280970,
+  "vp_hash": "77QmUPtjPfzWtF2AnpK9RQ"
+}
+```
+
+#### vp_token
+
+The VP token content is the same as in the SIOP vp_token example. 
 
 # vp_token encoding options
 
