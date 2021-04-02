@@ -713,6 +713,7 @@ In this case the OP selectively disclosed claims from a credential compatible wi
 
 # Alternatives
 - VP as JWT embedded in an ID Token via presentation exchange: https://hackmd.io/wljYjkzfTmKVW0bX91o_Iw?view
+- VP in all formats and with all proof formats embedded in id token
 
 ### Related Issues
 - https://bitbucket.org/openid/connect/issues/1206/how-to-support-ld-proofs-in-verifiable#comment-60051830
