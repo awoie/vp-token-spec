@@ -140,7 +140,7 @@ Here is an example:
    },
    "vp_token":{
       "format":"json-ld",
-      "credential_type":[
+      "credential_types":[
          {
             "type":"https://www.w3.org/2018/credentials/examples/v1/IDCardCredential",
             "claims":{
