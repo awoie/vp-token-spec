@@ -51,7 +51,7 @@ This specification supports two forms of SSI assertions: Verifiable Credentials 
 
 The Verifiable Credential (VC) is an assertion issued by an issuer to a certain holder. It can be used to assert claims towards a Verifier under some circumstances. Either the credential is a bearer credential, i.e. it is not bound to a certain secret that requires proof of control when presenting the credential, or the link between the subject of the credential and the presenter of the credential can be established by other means, e.g. by proofing control over the subject's DID in the same process. 
 
-Verifiable Presentations (VP) are used to present claims whole also cryptographically proofing the link between presenter and subject of one or more credentials. A verifiable presentation can contain a subset of claims asserted in a certain credential (selective disclosure) and it can assemble claims from different credentials. 
+Verifiable Presentations (VP) are used to present claims along with cryptographic proofs of the link between presenter and subject of the verifiable credentials it contains. A verifiable presentation can contain a subset of claims asserted in a certain credential (selective disclosure) and it can assemble claims from different credentials. 
 
 There are two formats of VCs and VPs: JWT and JSON-LD. Each of those formats has different properties and capabilites and each of them comes with different proof types. The JWT format can be used with JSON Web Signatures (https://www.w3.org/TR/vc-data-model/#json-web-token). JSON-LD is used with different kinds of Linked Data Proofs and JSON Web Signatures (https://www.w3.org/TR/vc-data-model/#json-ld).
 
@@ -134,11 +134,11 @@ Here is are examples of the different options:
 ```
 ### vc in id_token
 
-A Verifiable Credential embedded in an ID Token is requested by adding a element `vc` to the `id_token` top level element of the `claims` parameter. This element must contain a`credential_types` sub element as defined above.
+A Verifiable Credential embedded in an ID Token is requested by adding a element `vc` to the `id_token` top level element of the `claims` parameter. This element must contain a `credential_types` sub element as defined above.
 
 ### vp_token
 
-A VP Token is requested by adding a new top level element `vp_token` to the claims parameter. This element contains the same sub elements as defined above for the `vp` element and additionally the following sub elements:
+A VP Token is requested by adding a new top level element `vp_token` to the `claims` parameter. This element contains the same sub elements as defined above for the `vp` element and additionally the following sub elements:
 
 `format`
 String designating the VP format. Predefined values are `jwt` and `json-ld`.
@@ -164,7 +164,9 @@ Here is an example:
 }
 ```
 
-`vp_token` and/or `vc_token` are provided in the same response as the `id_token`. Depending on the response type, this can be either the authentication response or the token response. Authentication event information is conveyed via the id token while it's up to the RP to determine what (additional) claims are allocated to id_token and vp_token, respectively. If the `vp_token` is returned in the frontchannel, a hash (`vp_hash`) of `vp_token` must be included in `id_token`.
+`vp_token` and/or `vc_token` are provided in the same response as the `id_token`. Depending on the response type, this can be either the authentication response or the token response. Authentication event information is conveyed via the id token while it's up to the RP to determine what (additional) claims are allocated to `id_token` and `vp_token`, respectively, via the `claims` parameter. 
+
+If the `vp_token` or `vc_token` is returned in the frontchannel, a hash of the respective token MUST be included in `id_token` (see next chapter).
 
 ## ID Token Extensions
 
