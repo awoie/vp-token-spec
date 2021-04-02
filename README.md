@@ -14,24 +14,56 @@ This specification defines an extension of OpenID Connect to allows OpenID Conne
 
 ## Terminology
 
-If the specification states "Verifiable Presentation" this also includes "Verifiable Credentials". 
+ID Token
+
+Reyling Party
+
+OpeenID Connect Provider
+
+Holder
+
+Subject
+
+Verifier
+
+Credential
+
+A set of one or more claims made by an issuer. (see https://www.w3.org/TR/vc-data-model/#terminology)
+
+Verifiable Credential
+
+A verifiable credential is a tamper-evident credential that has authorship that can be cryptographically verified. Verifiable credentials can be used to build verifiable presentations, which can also be cryptographically verified. The claims in a credential can be about different subjects. (see https://www.w3.org/TR/vc-data-model/#terminology)
+
+Presentation
+
+Data derived from one or more verifiable credentials, issued by one or more issuers, that is shared with a specific verifier. (see https://www.w3.org/TR/vc-data-model/#terminology)
+
+Verified Presentation
+
+A verifiable presentation is a tamper-evident presentation encoded in such a way that authorship of the data can be trusted after a process of cryptographic verification. Certain types of verifiable presentations might contain data that is synthesized from, but do not contain, the original verifiable credentials (for example, zero-knowledge proofs). (see https://www.w3.org/TR/vc-data-model/#terminology)
+
 ## Introduction
 
-Notes:
-- this should really start with the explanation of the role signatures play in VCs (can be both JSON or JSON-LD) and that there are two widely used proof types (JWTs and LD-proofs)
-- Explain why is there a need for this extension?
+This specification extends OpenID Connect with support for assertion formats used by the SSI community. This allows existing OpenID Connect RPs to extends their reach towards identity  
+data provided in those formats. It also allows SSI applications to utilize OpenID Connect as integration and interoperability layer towards credential holders. 
+
+This specification supports two forms of SSI assertions: Verifiable Credentials and Verifiable Presentations.
+
+The Verifiable Credential (VC) is an assertion issued by an issuer to a certain holder. It can be used to assert claims towards a Verifier under some circumstances. Either the credential is a bearer credential, i.e. it is not bound to a certain secret that requires proof of control when presenting the credential, or the link between the subject of the credential and the presenter of the credential can be established by other means, e.g. by proofing control over the subject's DID in the same process. 
+
+Verifiable Presentations (VP) are used to present claims whole also cryptographically proofing the link between presenter and subject of one or more credentials. A verifiable presentation can contain a subset of claims asserted in a certain credential (selective disclosure) and it can assemble claims from different credentials. 
+
+There are two formats of VCs and VPs: JWT and JSON-LD. Each of those formats has different properties and capabilites and each of them comes with different proof types. The JWT format can be used with JSON Web Signatures (https://www.w3.org/TR/vc-data-model/#json-web-token). JSON-LD is used with different kinds of Linked Data Proofs and JSON Web Signatures (https://www.w3.org/TR/vc-data-model/#json-ld).
+
+This specification supports all beforementioned assertion and proof formats. 
 
 ## Overview
 
-This specifications introduces two mechanisms to provide Verifiable Presentations:
+This specifications introduces the following mechanisms to provide VCs and VPs to RPs:
 
-* ID Token as Verififiable Presentation: An ID Token may contain a claim `vp` or `vc` as defined in [JWT proof format](https://www.w3.org/TR/vc-data-model/#json-web-token), i.e. it is a valid OpenID Connect ID Token and a Verifiable Presentation at the same time. Consequently, this mechanism utilizes (and supports) the JWT proof format only. 
-* dedicated VP Token: a Verifiable Presentation is provided in a separate artifact designated as "VP Token". Such a token is provided to the RP in addition to an `id_token` in the `vp_token` parameter. VP Tokens support Verifiable Presentations in JSON-LD as well JWT format including all respective proof formats. They also allow to sign ID Token and Verifiable Presentation with different key. 
- 
-The `vp_token` is provided in the same response as the `id_token`. Depending on the response type, this can be either the authentication response or the token response. Authentication event information is conveyed via the id token while it's up to the RP to determine what (additional) claims are allocated to id_token and vp_token, respectively. If the vp_token is returned in the frontchannel, a hash (`vp_hash`) of `vp_token` must be included in `id_token`.
-
-`vp_hash`
-OPTIONAL. Hash value of `vp_token` that represents the W3C VP. Its value is the base64url encoding of the left-most half of the hash of the octets of the ASCII representation of the vp_token value, where the hash algorithm used is the hash algorithm used in the alg Header Parameter of the ID Token's JOSE Header. For instance, if the alg is RS256, hash the vp_token value with SHA-256, then take the left-most 128 bits and base64url encode them. The vp_hash value is a case sensitive string.
+* ID Token as Verififiable Presentation: An ID Token may contain a claim `vp` or `vc` as defined in [JWT proof format](https://www.w3.org/TR/vc-data-model/#json-web-token), i.e. it is a valid OpenID Connect ID Token and a VC or VP at the same time. Consequently, this mechanism utilizes (and supports) the external JWT proof format only. 
+* VP Token: a Verifiable Presentation is provided in a separate artifact designated as "VP Token". Such a token is provided to the RP in addition to an `id_token` in the `vp_token` parameter. VP Tokens support Verifiable Presentations in JSON-LD as well JWT format including all respective proof formats. They also allow to sign ID Token and Verifiable Presentation with different key. 
+* VC Token: a Verifiable Credential is provided in a separate artifact designated as "VC Token". Such a token is provided to the RP in addition to an `id_token` in the `vc_token` parameter. VC Tokens support Verifiable Presentations in JSON-LD as well JWT format including all respective proof formats.
 
 ## Requesting Verifiable Presentations
 
@@ -131,6 +163,22 @@ Here is an example:
     }
 }
 ```
+
+`vp_token` and/or `vc_token` are provided in the same response as the `id_token`. Depending on the response type, this can be either the authentication response or the token response. Authentication event information is conveyed via the id token while it's up to the RP to determine what (additional) claims are allocated to id_token and vp_token, respectively. If the `vp_token` is returned in the frontchannel, a hash (`vp_hash`) of `vp_token` must be included in `id_token`.
+
+## ID Token Extensions
+
+`vc` - see https://www.w3.org/TR/vc-data-model/#json-web-token-extensions
+
+
+`vp` - see https://www.w3.org/TR/vc-data-model/#json-web-token-extensions
+
+`vp_hash`
+OPTIONAL. Hash value of `vp_token` that represents the W3C VP. Its value is the base64url encoding of the left-most half of the hash of the octets of the ASCII representation of the `vp_token` value, where the hash algorithm used is the hash algorithm used in the alg Header Parameter of the ID Token's JOSE Header. For instance, if the alg is RS256, hash the vp_token value with SHA-256, then take the left-most 128 bits and base64url encode them. The `vp_hash` value is a case sensitive string.
+
+`vc_hash`
+OPTIONAL. Hash value of `vc_token` that represents the W3C VC. Its value is the base64url encoding of the left-most half of the hash of the octets of the ASCII representation of the `vc_token` value, where the hash algorithm used is the hash algorithm used in the alg Header Parameter of the ID Token's JOSE Header. For instance, if the alg is RS256, hash the `vc_token` value with SHA-256, then take the left-most 128 bits and base64url encode them. The `vc_hash` value is a case sensitive string.
+
 # Request Examples
 ## Front channel with vp in id_token
 This section illustrates the protocol flow for the case of communication through the front channel only (like in SIOP) where the `id_token` is a Verifiable Presentation as well. 
@@ -412,10 +460,7 @@ In this case the OP released a credential compatible with the eIDAS trust framew
         "country": "SE",
         "locality": "Örnsköldsvik"
       },
-      "nationality": "SE",
-      "number": "4901224131",
-      "date_of_issuance":"2010-03-23",
-      "date_of_expiry":"2020-03-22"
+      "nationality": "SE"
     }
   }
 }
