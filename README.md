@@ -90,74 +90,40 @@ A RP requests a Verifiable Presentation using the `claims` parameter.
 
 ### vp in id_token
 
-A Verifiable Presentation embedded in an ID Token is requested by adding a element `vp` to the `id_token` top level element of the `claims` parameter. This element must contain exactly one of the following sub elements:
+A Verifiable Presentation embedded in an ID Token is requested by adding a element `vp` to the `id_token` top level element of the `claims` parameter. This element must contain the following element:
 
 `credential_types`
 A string array containing a list of VC credential types the RP asks for. The OP shall respond with a presentation containing one credential of one of the listed types. 
 
-`claims`
-A list of objects designating claims about the End-User the RP wants to obtain. In this case, the RP does not make any assumption about credential types.
+Here is are examples: 
 
-`verified_claims`
-A `verified_claims` request structure as defined in OpenID Connect for Identity Assurance (https://openid.net/specs/openid-connect-4-identity-assurance-1_0.html). The RP uses this option to request claims fulfilling the requirements of a certain trust framework and identity assurance level without the need to specify specific credential types.
-
-Here is are examples of the different options: 
-
-```
+```json
 {
-    "id_token": {
-      "vp": {
-        "credential_types": ["https://www.w3.org/2018/credentials/examples/v1/IDCardredential"]
-      } 
-    }
+   "id_token":{
+      "acr":null,
+      "vp":{
+         "credential_types":[
+            "https://www.w3.org/2018/credentials/examples/v1/IDCardCredential"
+         ]
+      }
+   }
 }
 ```
 
-```
-{
-    "id_token": {
-      "vp": {
-        "claims":
-        {
-          "given_name": null,
-          "family_name": null,
-          "birthdate": null
-        }
-      } 
-    },
-}
-```
-
-```
-{
-    "id_token": {
-      "vp": {
-        "verified_claims": {
-            "verification": {
-                "trust_framework": {
-                    "value": "eidas"
-                },
-                "identity_assurance_level": {
-                    "value": "high"
-                }
-            },
-            "claims": {
-                "given_name": null,
-                "family_name": null,
-                "birthdate": null
-            }
-        }
-      } 
-    }
-}
-```
 ### vc in id_token
 
 A Verifiable Credential embedded in an ID Token is requested by adding a element `vc` to the `id_token` top level element of the `claims` parameter. This element must contain a `credential_types` sub element as defined above.
 
 ### vp_token
 
-A VP Token is requested by adding a new top level element `vp_token` to the `claims` parameter. This element contains the same sub elements as defined above for the `vp` element and additionally the following sub elements:
+A VP Token is requested by adding a new top level element `vp_token` to the `claims` parameter. This element contains the following sub elements:
+
+`credential_types`
+Object array containing definitions of credential types the RP wants to obtain along with an (optional) definition of the claims from the respective credential type the RP is requesting. Each of those object has the following fields:
+
+* `type` - String denoting a credential type
+
+* `claims` - An object determining the claims the RP wants to obtain using the same notation as used underneath `id_token`. 
 
 `format`
 String designating the VP format. Predefined values are `jwt` and `json-ld`.
@@ -166,28 +132,41 @@ String designating the VP format. Predefined values are `jwt` and `json-ld`.
 [TBD]
 
 Here is an example:
-```
+
+```json
 {
-    "id_token": {
-        "acr": null
-    },
-    "vp_token": {
-      "format": "json-ld",
-      "claims":
-      {
-        "given_name": null,
-        "family_name": null,
-        "birthdate": null
-      }
-    }
+   "id_token":{
+      "acr":null
+   },
+   "vp_token":{
+      "format":"json-ld",
+      "credential_type":[
+         {
+            "type":"https://www.w3.org/2018/credentials/examples/v1/IDCardCredential",
+            "claims":{
+               "given_name":null,
+               "family_name":null,
+               "birthdate":null
+            }
+         }
+      ]
+   }
 }
 ```
+
+### vc_token
+
+A VP Token is requested by adding a new top level element `vc_token` to the `claims` parameter. This element must contain a `credential_types` sub element as defined above.
+
+### vc_token/vp_token delivery
 
 `vp_token` and/or `vc_token` are provided in the same response as the `id_token`. Depending on the response type, this can be either the authentication response or the token response. Authentication event information is conveyed via the id token while it's up to the RP to determine what (additional) claims are allocated to `id_token` and `vp_token`, respectively, via the `claims` parameter. 
 
 If the `vp_token` or `vc_token` is returned in the frontchannel, a hash of the respective token MUST be included in `id_token` (see next chapter).
 
 ## ID Token Extensions
+
+This section defines the extensions to the ID Token structure used or defined in this specification. 
 
 `vc` - see https://www.w3.org/TR/vc-data-model/#json-web-token-extensions
 
