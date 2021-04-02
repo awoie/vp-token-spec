@@ -1,4 +1,4 @@
-# OpenID Connect extension for Verifiable Presentations
+# OpenID Connect extension for Verifiable Credentials and Verifiable Presentations
 
 ## Abstract
 
