@@ -200,16 +200,15 @@ OPTIONAL. Hash value of `vp_token` that represents the W3C VP. Its value is the 
 `vc_hash`
 OPTIONAL. Hash value of `vc_token` that represents the W3C VC. Its value is the base64url encoding of the left-most half of the hash of the octets of the ASCII representation of the `vc_token` value, where the hash algorithm used is the hash algorithm used in the alg Header Parameter of the ID Token's JOSE Header. For instance, if the alg is RS256, hash the `vc_token` value with SHA-256, then take the left-most 128 bits and base64url encode them. The `vc_hash` value is a case sensitive string.
 
-## Combinations
+## Tokens and Signatures
 
-This table shows the different compinations of OpenID Connect Flows, VC/VP representations and how the binding of the VC or VP with the subject is validated by the RP.
+This table shows the different combinations of signatures on id token, VC, and VP and how the binding of the VC or VP with the holder is validated by the RP.
 
-| OpenID Connect Flow | ID Token Signer | `vc` claim in ID Token | `vp` claim in ID Token | `vc_token` | `vp_token` 
-|:--------------------|:----------------|:---------------|:---------------|:---------|:--------------------------|
-| SIOP                | Holder          | bearer credential or same did in `sub` and credential | vp signed by holder | bearer credential or `vc_hash` + same did in `sub` and credential | VP signed by subject + `vp_hash` 
-| Standard (e.g. code)| OP              | bearer credential or `sub_ast` signed by holder + same did in `sub` and credential| bearer credential or `sub_ast` signed by holder + same did in `sub` and credential[does this make sense? it does not comply with w3c vc spec]| bearer credential or `vc_hash` + `sub_ast` signed by holder + same did in `sub` and credential | VP signed by subject + `vp_hash`
+| ID Token Signer | `vc` claim in ID Token | `vp` claim in ID Token | `vc_token` | `vp_token` 
+|:----------------|:---------------|:---------------|:---------|:--------------------------|
+| Holder of the VC | bearer credential or same did in `sub` and credential | vp signed by holder | bearer credential or same did in `sub` and credential + `vc_hash` | VP signed by holder + `vp_hash` 
+| Other entity (e.g. OP)| bearer credential | n/a | bearer credential  | VP signed by holder + `vp_hash`
 
-NOTE: `sub_ast` is defined in https://github.com/mattrglobal/oidc-portable-identities.
 
 # Request Examples
 ## SIOP with ID Token as VP
