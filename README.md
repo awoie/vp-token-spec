@@ -2,7 +2,7 @@
 
 ## Abstract
 
-This specification defines an extension of OpenID Connect to allows OpenID Connect OPs to provide RPs with End-User claims as W3C Verifiable Presentations or W3C Verifiable Credentials in addition to claims provided in the `id_token` and/or via Userinfo responses.
+This specification defines an extension of OpenID Connect to allow OpenID Connect OPs to provide RPs with End-User claims as W3C Verifiable Presentations or W3C Verifiable Credentials in addition to claims provided in the `id_token` and/or via Userinfo responses.
 
 ## Authors
 
