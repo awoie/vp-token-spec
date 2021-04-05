@@ -224,17 +224,17 @@ The successful authentication response contains an `id_token` and `state`.
 ```
 ### Verifiable Presentation
 
-The ID Token contains a `vp` element with the Verifiable Credential data. 
+The ID Token contains a `VerifiablePresentation` element with the Verifiable Presentation and Verifiable Credential data. 
 
 ```json
-{
+{ /// issuer, audience, etc. of the ID Token
    "iss":"https://book.itsourweb.org:3000/wallet/wallet.html",
    "aud":"https://book.itsourweb.org:3000/client_api/authresp/uhn",
    "iat":1615910538,
    "exp":1615911138,
    "sub":"urn:uuid:68f874e2-377c-437f-a447-b304967ca351",
    "auth_time":1615910535,
-   "vp":{
+   "verifaiblePresentation":{
       "@context":[
          "https://www.w3.org/2018/credentials/v1",
          "https://ohip.ontario.ca/v1"
@@ -242,25 +242,10 @@ The ID Token contains a `vp` element with the Verifiable Credential data.
       "type":[
          "VerifiablePresentation"
       ],
-      "verifiableCredential":[
-         "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6InVybjp1dWlkOjU0ZDk2NjE2LTE1MWUt
-          NDkyOC04NTljLWMzMzE5YTQxODg1YyJ9.eyJzdWIiOiJ1cm46dXVpZDo2OGY4NzRlMi0zNzdjLTQz
-          N2YtYTQ0Ny1iMzA0OTY3Y2EzNTEiLCJpc3MiOiJodHRwczovL2Jvb2suaXRzb3Vyd2ViLm9yZzozM
-          DAwL29oaXAiLCJpYXQiOjE2MTU5MTAxNTUsImV4cCI6MTYxNjA4Mjk1NSwiYXVkIjoiaHR0cHM6Ly
-          9ib29rLml0c291cndlYi5vcmc6MzAwMC93YWxsZXQvd2FsbGV0Lmh0bWwiLCJqdGkiOiJ1cm46dXV
-          pZDo3ZmU5MThmMC1jMTcyLTQzNGMtOWQ5Yi0zZDIxZDQ1YjNlNjIiLCJ2YyI6eyJAb3B0aW9ucyI6
-          WyJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy92MSIsImh0dHBzOi8vb2hpcC5vb
-          nRhcmlvLmNhL3YxIl0sInR5cGUiOlsiVmVyaWZpYWJsZUNyZWRlbnRpYWwiLCJodHRwczovL2RpZC
-          5pdHNvdXJ3ZWIub3JnOjMwMDAvc21hcnQtY3JlZGVudGlhbC9PbnRhcmlvLUhlYWx0aC1JbnN1cmF
-          uY2UtUGxhbiJdLCJkZXNjcmlwdGlvbiI6Ik9ISVAgc3RhdHVzIiwiY3JlZGVudGlhbFN1YmplY3Qi
-          OnsiaGVhbHRoTnVtYmVyIjoiMTEyMjMzNDQ1NSIsInZlcnNpb25OdW1iZXIiOiJOViIsImRhdGVPZ
-          kJpcnRoIjoiMTk5NS8wNy8xMCIsImZpcnN0TmFtZSI6IkphbmUiLCJsYXN0TmFtZSI6IkRvZSIsIn
-          Bvc3RhbENvZGUiOiJNNkgzQjMiLCJzdGF0dXMiOiJPSyJ9fX0.dFXuhMzZMU15aN1gdrhDDl9ENrJ
-          jC1fXYPj4yOhqKgkVBzLBQZe5EfLCqo2CkhPirC7wqFPedqGC5MsaCNIqBAlsrzSm7bbpoj-73-_3
-          x6iEKvc8zOLZlHIVN4S9tl_H2HztYBv8GGuu2fvPdKzMRwdsxIV0Q-KDUEJQqX902TEFXqcffEFWp
-          1DJ3KFpFCNHsmf_mDztjqUZJtsBr5aMzxYypu9br5irBGS039USzFMvdVPLoZSCmR-HZqufbKnoih
-          dqwQaVxWU-o4fmQVx7_kmz7e9npe2TvlhMAmwOutBUhoUZAyjxpiiJEim5qnI2rD0KRw-i9qO6Dr9
-          OLryT1g"    
+      "vp":[
+         "ewogICAgImlzcyI6Imh0dHBzOi8vYm9vay5pdHNvdXJ3ZWIub3JnOjMwMDAvd2FsbGV0L3dhbGxl
+            ...
+            IH0="    
       ]
    },
    "nonce":"960848874",
@@ -276,6 +261,50 @@ The ID Token contains a `vp` element with the Verifiable Credential data.
    }
 }
 ```
+
+The ID Token contains the underlying VP in the `vp` element, which decodes to
+
+```json
+  { /// issuer, audience of Verifiable Presentation
+    "iss":"urn:uuid:68f874e2-377c-437f-a447-b304967ca351",
+    "jti":"urn:uuid:68f874e2-377c-437f-a447-b304967ca351",
+    "aud":"https://book.itsourweb.org:3000/ohip",
+    "iat":1615910538,
+    "exp":1615911138,   
+    "nbf":1615910538,
+    "nonce":"acIlfiR6AKqGHg",
+    "vp":{
+        "@context":[
+          "https://www.w3.org/2018/credentials/v1",
+          "https://ohip.ontario.ca/v1"
+        ],
+        "type":[
+          "VerifiablePresentation"
+        ],
+        "verifiableCredential":[
+          "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6InVybjp1dWlkOjU0ZDk2NjE2LTE1MWUt
+            NDkyOC04NTljLWMzMzE5YTQxODg1YyJ9.eyJzdWIiOiJ1cm46dXVpZDo2OGY4NzRlMi0zNzdjLTQz
+            N2YtYTQ0Ny1iMzA0OTY3Y2EzNTEiLCJpc3MiOiJodHRwczovL2Jvb2suaXRzb3Vyd2ViLm9yZzozM
+            DAwL29oaXAiLCJpYXQiOjE2MTU5MTAxNTUsImV4cCI6MTYxNjA4Mjk1NSwiYXVkIjoiaHR0cHM6Ly
+            9ib29rLml0c291cndlYi5vcmc6MzAwMC93YWxsZXQvd2FsbGV0Lmh0bWwiLCJqdGkiOiJ1cm46dXV
+            pZDo3ZmU5MThmMC1jMTcyLTQzNGMtOWQ5Yi0zZDIxZDQ1YjNlNjIiLCJ2YyI6eyJAb3B0aW9ucyI6
+            WyJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy92MSIsImh0dHBzOi8vb2hpcC5vb
+            nRhcmlvLmNhL3YxIl0sInR5cGUiOlsiVmVyaWZpYWJsZUNyZWRlbnRpYWwiLCJodHRwczovL2RpZC
+            5pdHNvdXJ3ZWIub3JnOjMwMDAvc21hcnQtY3JlZGVudGlhbC9PbnRhcmlvLUhlYWx0aC1JbnN1cmF
+            uY2UtUGxhbiJdLCJkZXNjcmlwdGlvbiI6Ik9ISVAgc3RhdHVzIiwiY3JlZGVudGlhbFN1YmplY3Qi
+            OnsiaGVhbHRoTnVtYmVyIjoiMTEyMjMzNDQ1NSIsInZlcnNpb25OdW1iZXIiOiJOViIsImRhdGVPZ
+            kJpcnRoIjoiMTk5NS8wNy8xMCIsImZpcnN0TmFtZSI6IkphbmUiLCJsYXN0TmFtZSI6IkRvZSIsIn
+            Bvc3RhbENvZGUiOiJNNkgzQjMiLCJzdGF0dXMiOiJPSyJ9fX0.dFXuhMzZMU15aN1gdrhDDl9ENrJ
+            jC1fXYPj4yOhqKgkVBzLBQZe5EfLCqo2CkhPirC7wqFPedqGC5MsaCNIqBAlsrzSm7bbpoj-73-_3
+            x6iEKvc8zOLZlHIVN4S9tl_H2HztYBv8GGuu2fvPdKzMRwdsxIV0Q-KDUEJQqX902TEFXqcffEFWp
+            1DJ3KFpFCNHsmf_mDztjqUZJtsBr5aMzxYypu9br5irBGS039USzFMvdVPLoZSCmR-HZqufbKnoih
+            dqwQaVxWU-o4fmQVx7_kmz7e9npe2TvlhMAmwOutBUhoUZAyjxpiiJEim5qnI2rD0KRw-i9qO6Dr9
+            OLryT1g"    
+        ]
+    }   
+  }
+```
+
 
 The `vp` element in turn contains the underlying VC in the `verifiableCredential` element, which decodes to
 
@@ -366,7 +395,7 @@ This example shown an ID Token containing a `vp_hash`:
 
 ```json
 {
-   "iss":"https://book.itsourweb.org:3000/wallet/wallet.html",
+   "iss":"https://self-issued.me",
    "aud":"https://book.itsourweb.org:3000/client_api/authresp/uhn",
    "iat":1615910538,
    "exp":1615911138,
@@ -439,7 +468,7 @@ This example shown an ID Token containing a `vp_hash`:
 }
 ```
 
-## Standard OpenID Connect (backchannel)
+## OpenID Connect Authorization Code flow
 
 This section illustrates the protocol flow for the case of communication using frontchannel and backchannel (utilizing the authorization code flow).
 
