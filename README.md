@@ -1,8 +1,8 @@
-# OpenID Connect vp_token response parameter extension 
+# OpenID Connect for Verifiable Credential presentation
 
 ## Abstract
 
-This specification defines the additional OpenID Connect authentication response parameter `vp_token`. The new parameter allows OpenID Connect OPs to provide RPs with End-User claims as W3C Verifiable Presentations or W3C Verifiable Credentials in addition to claims provided in the`id_token` and/or via Userinfo responses.
+This specification defines additional parameters `vp_jwt`, `vp_ldp`, `vc_jwt`, `vc_ldp`. The new parameter allows OpenID Connect OPs to provide RPs with End-User claims as W3C Verifiable Presentations or W3C Verifiable Credentials in the `id_token` or via Userinfo responses.
 
 ## Authors
 
@@ -12,15 +12,67 @@ This specification defines the additional OpenID Connect authentication response
 - Adam Lemmon (Trybe.ID)
 - Tobias Looker (Mattr)
 
+## Terminology
+
+Credential
+
+A set of one or more claims made by an issuer. (see https://www.w3.org/TR/vc-data-model/#terminology)
+
+Verifiable Credential
+
+A verifiable credential is a tamper-evident credential that has authorship that can be cryptographically verified. Verifiable credentials can be used to build verifiable presentations, which can also be cryptographically verified. The claims in a credential can be about different subjects. (see https://www.w3.org/TR/vc-data-model/#terminology)
+
+Presentation
+
+Data derived from one or more verifiable credentials, issued by one or more issuers, that is shared with a specific verifier. (see https://www.w3.org/TR/vc-data-model/#terminology)
+
+Verified Presentation
+
+A verifiable presentation is a tamper-evident presentation encoded in such a way that authorship of the data can be trusted after a process of cryptographic verification. Certain types of verifiable presentations might contain data that is synthesized from, but do not contain, the original verifiable credentials (for example, zero-knowledge proofs). (see https://www.w3.org/TR/vc-data-model/#terminology)
+
 ## Introduction
+
+This specification extends OpenID Connect with support for presentation of claims via W3C Verifiable Credentials. This allows existing OpenID Connect RPs to extends their reach towards claims sources asserting claims in this format. It also allows new applications built using Verifiable Credentials to utilize OpenID Connect as integration and interoperability layer towards credential holders. 
+
+This specification supports two ways to present Verifiable Credentials. Its is possible to provide the RP directly with a Verificable Credential or to use a Verifiable Presentation.
+
+The Verifiable Credential (VC) can be used to assert claims towards a Verifier under some circumstances. Either the credential is a bearer credential, i.e. it is not bound to a certain secret that requires proof of control when presenting the credential, or the link between the subject of the credential and the presenter of the credential can be established by other means, e.g. by proofing control over the subject's DID in the same process. 
+
+Verifiable Presentations (VP) are used to present claims along with cryptographic proofs of the link between presenter and subject of the verifiable credentials it contains. A verifiable presentation can contain a subset of claims asserted in a certain credential (selective disclosure) and it can assemble claims from different credentials. 
+
+There are two formats of VCs and VPs: JWT and JSON-LD. Each of those formats has different properties and capabilites and each of them comes with different proof types. The JWT format can be used with JSON Web Signatures (https://www.w3.org/TR/vc-data-model/#json-web-token). JSON-LD is used with different kinds of Linked Data Proofs and JSON Web Signatures (https://www.w3.org/TR/vc-data-model/#json-ld).
 
 This specification defines standard claims that allow implementations to use any of the four representations of Verifiable Credential objects (vp_jwt, vp_ldp, vc_jwt, vc_ldp) with JWTs (such as ID tokens) and sets of JSON claims (such as UserInfo Endpoint responses). 
 
-ToDo: include explanation of two standard proof types (JWTs and LD-proofs) for Verifiable Credentials, especially LD-Proofs that are new to OIDC community.
+This specification supports all beforementioned assertion and proof formats. 
+
+## Use Cases
+
+### Verifier accesses Wallet via OpenID Connect
+
+A Verifier uses OpenID Connect to obtain verifiable presentations. This is a simple and mature way to obtain identity data. From a technical perspective, this also makes integration with OAuth-protected APIs easier as OpenID Connect is based on OAuth.  
+
+### Existing OpenID Connect RP integrates SSI wallets
+
+An application currently utilizing OpenID Connect for accessing various federated identity providers can use the same protocol to also integrate with emerging SSI-based wallets. Thats an conveient transition path leveraging existing expertise and protecting investments made.
+
+### Existing OpenID Connect OP as custodian of End-User Credentials
+
+An existing OpenID Connect may extends its service by maintaining credentials issued by other claims sources on behalf of its customers. Customers can mix claims of the OP and from their credentials to fulfil authentication requests. 
+
+### Federated OpenID Connect OP adds device-local mode
+
+An extisting OpenID Connect OP with a native user experience (PWA or native app) issues Verifiable Credentials and stores it on the user's device linked to a private key residing on this device under the user's control. For every authentication request, the native user experience first checks whether this request can be fulfilled using the locally stored credentials. If so, it generates a presentations signed with the user's keys in order to prevent replay of the credential. 
+
+This approach dramatically reduces latency and reduces load on the OP's servers. Moreover, the user can identity, authenticate, and authorize even in situations with unstable or without internet connectivity. 
 
 ## Overview
-- OP encodes VCs using the rules defined in the Verifiable Credential specification either in JWT format or JSON-LD format.  
-- These encoded VCs are then passed as parameters as JWT claims or as sets of JSON claims.
+This specifications introduces the following mechanisms to provide VCs and VPs to RPs:
+* In the ID Token: An ID Token may contain a claim `vp_jwt`, `vp_ldp`, `vc_jwt`, or `vc_ldp`.
+* From the UserInfo Response: UserInfo response may contain a claim `vp_jwt`, `vp_ldp`, `vc_jwt`, or `vc_ldp`.
+
+Note that OP would first encode VPs/VCs using the rules defined in the Verifiable Credential specification either in JWT format or JSON-LD format, before passing encoded VPs/VCs as `vp_jwt`, `vp_ldp`, `vc_jwt`, or `vc_ldp` parameters as JWT claims or as sets of JSON claims.
+
 
 # JWT Claims to represent W3C Verifiable Credentials objects
 
