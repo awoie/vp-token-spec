@@ -14,390 +14,250 @@ This specification defines the additional OpenID Connect authentication response
 
 ## Introduction
 
-Notes:
-- this should really start with the explanation of the role signatures play in VCs (can be both JSON or JSON-LD) and that there are two widely used proof types (JWTs and LD-proofs)
-- Explain why is there a need for this extension?
+This specification defines standard claims that allow implementations to use any of the four representations of Verifiable Credential objects (vp_jwt, vp_ldp, vc_jwt, vc_ldp) with JWTs (such as ID tokens) and sets of JSON claims (such as UserInfo Endpoint responses). 
+
+ToDo: include explanation of two standard proof types (JWTs and LD-proofs) for Verifiable Credentials, especially LD-Proofs that are new to OIDC community.
 
 ## Overview
-- RP requests `vp_token` by adding an additional destination `vp_token` in the `claims` request parameter. 
-- Authentication event information is conveyed via the id token while it's up to the RP to determine what (additional) claims are allocated to id_token and vp_token, respectively.
-- `vp_token` is provided in the same response as the `id_token`. Depending on the response type, this can be either the authentication response or the token response. 
-- If the vp_token is returned in the frontchannel, a hash (`vp_hash`) of `vp_token` must be included in `id_token`.
+- OP encodes VCs using the rules defined in the Verifiable Credential specification either in JWT format or JSON-LD format.  
+- These encoded VCs are then passed as parameters as JWT claims or as sets of JSON claims.
 
-`vp_hash`
-OPTIONAL. Hash value of `vp_token` that represents the W3C VP. Its value is the base64url encoding of the left-most half of the hash of the octets of the ASCII representation of the vp_token value, where the hash algorithm used is the hash algorithm used in the alg Header Parameter of the ID Token's JOSE Header. For instance, if the alg is RS256, hash the vp_token value with SHA-256, then take the left-most 128 bits and base64url encode them. The vp_hash value is a case sensitive string.
+# JWT Claims to represent W3C Verifiable Credentials objects
 
-# Frontchannel
-This section illustrates the protocol flow for the case of communication through the front channel only (like in SIOP).
-## Authentication request
+W3C Verifiable Credentials specification defines two kinds of objects – Verifiable Credentials and Verifiable Presentations, and it also orthogonally defines two proof formats of these objects – JWT and Linked Data Proofs. Thus, there are four data types that different use cases could utilize.
+ 
+This specification defines the following parameters to pass Verifiable Presentations or Verifiable Credentials signed as JWTs or using Linked Data Proofs:
 
-The following is a non-normative example of how an RP would use the `claims` parameter to request claims in the `vp_token`:
+- vc_jwt:  A claim whose value is a W3C Verifiable Credential object using the JWT representation, which is a JSON string.  The claim’s value may also be an array of W3C Verifiable Credential objects using the JWT representation if the use case calls for multiple JWT VCs.
 
-```
-  HTTP/1.1 302 Found
-  Location: openid://?
-    response_type=id_token
-    &client_id=https%3A%2F%2Fclient.example.org%2Fcb
-    &redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb
-    &scope=openid
-    &claims=...
-    &state=af0ifjsldkj
-    &nonce=n-0S6_WzA2Mj
-    &registration_uri=https%3A%2F%2F
-      client.example.org%2Frf.txt%22%7D
-      
-```
-### claims parameter (simple)
+- vp_jwt:  A claim whose value is a W3C Verifiable Presentation object using the JWT representation, which is a JSON string.  The claim’s value may also be an array of W3C Verifiable Presentation objects using the JWT representation if the use case calls for multiple JWT VPs.
 
-In its simplest form, the RP just asks the OP to provide a VP or VC containing a set of claims in the response by listing those claims underneath `vp_token`.  
+- vc_ldp:  A claim whose value is a W3C Verifiable Credential object using the JSON-LD representation, which is a JSON object.  The claim’s value may also be an array of W3C Verifiable Credential objects using the JSON-LD representation if the use case calls for multiple JSON-LD VCs.
+
+- vp_ldp:  A claim whose value is a W3C Verifiable Presentation object using the JSON-LD representation, which is a JSON object.  The claim’s value may also be an array of W3C Verifiable Presentation objects using the JSON-LD representation if the use case calls for multiple JSON-LD VPs.
+
+# W3C Verifiable Credentials objects returned with JWTs 
+This section illustrates the response when W3C Verifiable Credentials objects are returned with JTWs such as inside ID Token.
+
+## Self-Issued OP Response
+Below are the examples when W3C Verifiable Credentials are returned inside ID Token as part of Self-Issued OP response. ID Token contains a `vp_jwt` or `vp_ldp` element with the Verifiable Presentation data, or a `vc_jwt` or `vc_ldp` element with the Verifiable Credential data. 
+
+### ID Token with Verifiable Credentials signed as JWTs
+
+Below is a non-normative example of ID Token that includes `vp_jwt` claim.
 
 ```
 {
-    "id_token": {
-        "acr": null
-    },
-    "vp_token": {
-        "given_name": null,
-        "family_name": null,
-        "birthdate": null
-    }
+  "kid": "did:ion:EiC6Y9_aDaCsITlY06HId4seJjJ...b1df31ec42d0",
+  "typ": "JWT",
+  "alg": "ES256K"
+}.{
+   "iss":"https://book.itsourweb.org:3000/wallet/wallet.html",
+   "aud":"https://book.itsourweb.org:3000/client_api/authresp/uhn",
+   "iat":1615910538,
+   "exp":1615911138,
+   "sub":""did:ion:EiC6Y9_aDaCsITlY06HId4seJjJ-9...mS3NBIn19",
+   "auth_time":1615910535,
+   "nonce":"960848874",
+   "vp_jwt":[
+            "ewogICAgImlzcyI6Imh0dHBzOi8vYm9vay5pdHNvdXJ3ZWIub...IH0="
+   ],   
+   "sub_jwk":{
+      "crv":"P-384",
+      "kty":"EC",
+      "kid": "c7298a61a6904426a580b1df31ec42d0",
+      "x":"jf3a6dquclZ4PJ0JMU8RuucG9T1O3hpU_S_79sHQi7VZBD9e2VKXPts9lUjaytBm",
+      "y":"38VlVE3kNiMEjklFe4Wo4DqdTKkFbK6QrmZf77lCMN2x9bENZoGF2EYFiBsOsnq0"
+   }
 }
 ```
 
-### claims parameter (with identity assurance requirements)
+Below is a non-normative example of a decoded Verifiable Presentation object that was included in `vp_jwt`. 
+Note that `vp` is used to contain only "those parts of the standard verifiable presentation where no explicit encoding rules for JWT exist" [VC-DATA-MODEL]
 
-The RP may also request claims fulfilling the requirtements of a certain trust framework and identity assurance level. It does so by adding a `verified_claims` claims element to the `vp_token` section, which defines the verification requirements and lists the respective End-User claims. 
-Note: this syntax was adopted from the OpenID Connect for Identity Assurance spec (https://openid.net/specs/openid-connect-4-identity-assurance-1_0.html).
+```
+  {
+    "iss":"urn:uuid:68f874e2-377c-437f-a447-b304967ca351",
+    "jti":"urn:uuid:68f874e2-377c-437f-a447-b304967ca351",
+    "aud":"https://book.itsourweb.org:3000/ohip",
+    "iat":1615910538,
+    "exp":1615911138,   
+    "nbf":1615910538,
+    "nonce":"acIlfiR6AKqGHg",
+    "vp":{
+        "@context":[
+          "https://www.w3.org/2018/credentials/v1",
+          "https://ohip.ontario.ca/v1"
+        ],
+        "type":[
+          "VerifiablePresentation"
+        ],
+        "verifiableCredential":[
+          "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6InVybjp1dWlkOjU0ZDk2NjE2LTE1MWUt...OLryT1g"    
+        ]
+    }   
+  }
+```
+
+### ID Token with Verifiable Presentation signed using Linked Data Format
+
+Below is a non-normative example of ID Token that includes `vp_ldp` claim.
 
 ```
 {
-    "id_token": {
-        "acr": null
-    },
-    "vp_token": {
-        "verified_claims": {
-            "verification": {
-                "trust_framework": {
-                    "value": "eidas"
-                },
-                "identity_assurance_level": {
-                    "value": "high"
-                }
+   "iss":"https://book.itsourweb.org:3000/wallet/wallet.html",
+   "aud":"https://book.itsourweb.org:3000/client_api/authresp/uhn",
+   "iat":1615910538,
+   "exp":1615911138,
+   "sub":"urn:uuid:68f874e2-377c-437f-a447-b304967ca351",
+   "auth_time":1615910535,
+   "vp_ldp":[
+     {
+      "@context":[
+         "https://www.w3.org/2018/credentials/v1"
+      ],
+      "type":[
+         "VerifiablePresentation"
+      ],
+      "verifiableCredential":[
+         {
+            "@context":[
+               "https://www.w3.org/2018/credentials/v1",
+               "https://www.w3.org/2018/credentials/examples/v1"
+            ],
+            "id":"https://example.com/credentials/1872",
+            "type":[
+               "VerifiableCredential",
+               "IDCardCredential"
+            ],
+            "issuer":{
+               "id":"did:example:issuer"
             },
-            "claims": {
-                "given_name": null,
-                "family_name": null,
-                "birthdate": null
+            "issuanceDate":"2010-01-01T19:23:24Z",
+            "credentialSubject":{
+               "given_name":"Fredrik",
+               "family_name":"Strömberg",
+               "birthdate":"1949-01-22"
+            },
+            "proof":{
+               "type":"Ed25519Signature2018",
+               "created":"2021-03-19T15:30:15Z",
+               "jws":"eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..PT8yCqVjj5ZHD0W36zsBQ47oc3El07WGPWaLUuBTOT48IgKI5HDoiFUt9idChT_Zh5s8cF_2cSRWELuD8JQdBw",
+               "proofPurpose":"assertionMethod",
+               "verificationMethod":"did:example:issuer#keys-1"
             }
-        }
-    }
-}
-```
-## Authentication Response 
-
-The successful authentication response contains a `vp_token` parameter along with  `id_token` and `state`.
-```
-  HTTP/1.1 302 Found
-  Location: https://client.example.org/cb#
-    id_token=eyJ0 ... NiJ9.eyJ1c ... I6IjIifX0.DeWt4Qu ... ZXso
-    &vp_token=...
-    &state=af0ifjsldkj
-      
-```
-
-For the potential content of the vp_token parameter see (#vp_token_content).
-
-# Front channel using the id_token as the vp_token
-This section illustrates the protocol flow for the case of communication through the front channel only (like in SIOP) where the `id_token` is used as the `vp_token`. In this section there is no new `vp_token` artifact.
-
-Note that this flow currently only supports JWT based Verifiable Presentations.
-
-## Authentication request
-
-The following is a non-normative example of how an RP would use the `claims` parameter to request the `vp` claim in the `id_token`:
-
-```
-  HTTP/1.1 302 Found
-  Location: openid://?
-    response_type=id_token
-    &client_id=https%3A%2F%2Fclient.example.org%2Fcb
-    &redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb
-    &scope=openid
-    &claims=...
-    &state=af0ifjsldkj
-    &nonce=n-0S6_WzA2Mj
-    &registration_uri=https%3A%2F%2F
-      client.example.org%2Frf.txt%22%7D
-      
-```
-### claims parameter (simple)
-
-In its simplest form, the RP just asks the OP to provide a VP or VC containing a set of claims in the response by listing those claims underneath `id_token.vp`.  
-
-```
-{
-    "id_token": {
-      "vp": {
-        "given_name": null,
-        "family_name": null,
-        "birthdate": null
-      } 
-    },
+         }
+      ],
+      "id":"ebc6f1c2",
+      "holder":"did:example:holder",
+      "proof":{
+         "type":"Ed25519Signature2018",
+         "created":"2021-03-19T15:30:15Z",
+         "challenge":"()&)()0__sdf",
+         "jws":"eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..GF5Z6TamgNE8QjE3RbiDOj3n_t25_1K7NVWMUASe_OEzQV63GaKdu235MCS3hIYvepcNdQ_ZOKpGNCf0vIAoDA",
+         "proofPurpose":"authentication",
+         "verificationMethod":"did:example:holder#key-1"
+       }
+     }
+   ],
+   "nonce":"960848874",
+   "sub_jwk":{
+      "crv":"P-384",
+      "kty":"EC",
+      "x":"jf3a6dquclZ4PJ0JMU8RuucG9T1O3hpU_S_79sHQi7VZBD9e2VKXPts9lUjaytBm",
+      "y":"38VlVE3kNiMEjklFe4Wo4DqdTKkFbK6QrmZf77lCMN2x9bENZoGF2EYFiBsOsnq0"
+   }
 }
 ```
 
-## Authentication Response 
 
-The successful authentication response contains an `id_token` and `state`.
-```
-  HTTP/1.1 302 Found
-  Location: https://client.example.org/cb#
-    id_token=...
-    &state=af0ifjsldkj
-      
-```
+# W3C Verifiable Credentials objects returned as sets of JSON claims (backchannel)
+This section illustrates the response when W3C Verifiable Credentials objects are returned as sets of JSON claims such as user_info endpoint responses.
 
-For the potential content of the `id_token` parameter see (#W3C Verifiable Presentation using external JWT proofs).
+## UserInfo Response
+Below are the examples when W3C Verifiable Credentials are returned from user_info endpoint utilizing the authorization code flow.
 
+### UserInfo Response with with Verifiable Credentials signed as JWTs
 
-# Standard OpenID Connect (backchannel)
-
-This section illustrates the protocol flow for the case of communication using frontchannel and backchannel (utilizing the authorization code flow).
-
-## Authentication Request
+Below is a non-normative example of a UserInfo Response that includes `vp_jwt` claim:
 
 ```
-  GET /authorize?
-    response_type=code
-    &client_id=s6BhdRkqt3 
-    &redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb
-    &scope=openid
-    &claims=...
-    &state=af0ifjsldkj
-    &nonce=n-0S6_WzA2Mj HTTP/1.1
-  Host: server.example.com
-```
+  HTTP/1.1 200 OK
+  Content-Type: application/json
 
-## Authentication Response
-```
-HTTP/1.1 302 Found
-  Location: https://client.example.org/cb?
-    code=SplxlOBeZQQYbYS6WxSbIA
-    &state=af0ifjsldkj
-```
-
-## Token Request
-```
-  POST /token HTTP/1.1
-  Host: server.example.com
-  Content-Type: application/x-www-form-urlencoded
-  Authorization: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW
-
-  grant_type=authorization_code
-  &code=SplxlOBeZQQYbYS6WxSbIA
-  &redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb
-```
-
-## Token Response
-
-```
-{
-   "access_token": "SlAV32hkKG",
-   "token_type": "Bearer",
-   "refresh_token": "8xLOxBtZp8",
-   "expires_in": 3600,
-   "id_token": "eyJ0 ... NiJ9.eyJ1c ... I6IjIifX0.DeWt4Qu ... ZXso"
-   "vp_token": "wl93lqt7_R...Cf0h"
+  {
+   "sub": "248289761001",
+   "name": "Jane Doe",
+   "given_name": "Jane",
+   "family_name": "Doe",
+   "vp_jwt":["ewogICAgImlzcyI6Imh0dHBzOi8vYm9vay5pdHNvdXJ3ZWIub...IH0="]
   }
 ```
 
-# vp_token encoding options
+### UserInfo Response with with Verifiable Credentials signed using Linked Data Format
 
-## W3C Verifiable Credential using external JWT proofs
+Below is a non-normative example of a UserInfo Response that includes `vp_ldp` claim:
 
-The following is a non-normative example of a W3C VC using the external [JWT proof format](https://www.w3.org/TR/vc-data-model/#json-web-token), i.e., standard W3C VC encoded as a JWT (base64url decoded JWT payload only). 
-
-In this case the OP released a credential compatible with the eIDAS trust framework as requested by the RP (a swedish id card). 
-
-```json
-{
-  "iss": "did:example:issuer",
-  "sub": "did:example:holder",
-  "jti": "http://example.edu/credentials/3732",
-  "nbf": 1541493724,
-  "iat": 1541493724,
-  "exp": 1573029723,
-  "vc": {
-    "@context": [
-      "https://www.w3.org/2018/credentials/v1",
-      "https://www.w3.org/2018/credentials/examples/v1"
-    ],
-    "type": [
-      "VerifiableCredential",
-      "IDCardredential"
-    ],
-    "issuer":{
-      "name":"Skatteverket",
-      "country":"SE"
-    }
-    "credentialSubject": {
-      "given_name": "Fredrik",
-      "family_name": "Strömberg",
-      "birthdate": "1949-01-22",
-      "place_of_birth": {
-        "country": "SE",
-        "locality": "Örnsköldsvik"
-      },
-      "nationality": "SE",
-      "number": "4901224131",
-      "date_of_issuance":"2010-03-23",
-      "date_of_expiry":"2020-03-22"
-    }
-  }
-}
 ```
+  HTTP/1.1 200 OK
+  Content-Type: application/json
 
-## W3C Verifiable Credential using internal proofs
-
-The following is a non-normative example of a W3C VC using the internal proof format. The proof property contains a JSON-LD Proof and uses the detached JWS encoding for the signature representation.
-
-In this case the OP released a credential compatible with the eIDAS trust framework as requested by the RP (a swedish id card). 
-
-```json
-{
-  "@context": [
-    "https://www.w3.org/2018/credentials/v1",
-    "https://www.w3.org/2018/credentials/examples/v1"
-  ],
-  "id": "https://example.com/credentials/1872",
-  "type": [
-    "VerifiableCredential",
-    "IDCardredential"
-  ],
-  "issuer": {
-    "id": "did:example:issuer",
-    "name":"Skatteverket",
-    "country":"SE"
-  },
-  "issuanceDate": "2010-01-01T19:23:24Z",
-  "credentialSubject": {
-    "given_name": "Fredrik",
-    "family_name": "Strömberg",
-    "birthdate": "1949-01-22",
-    "place_of_birth": {
-       "country": "SE",
-       "locality": "Örnsköldsvik"
-    },
-     "nationality": "SE",
-    "number": "4901224131",
-    "date_of_issuance":"2010-03-23",
-    "date_of_expiry":"2020-03-22"
-  },
-  "proof": {
-    "type": "Ed25519Signature2018",
-    "created": "2021-03-19T15:30:15Z",
-    "jws": "eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..PT8yCqVjj5ZHD0W36zsBQ47oc3El07WGPWaLUuBTOT48IgKI5HDoiFUt9idChT_Zh5s8cF_2cSRWELuD8JQdBw",
-    "proofPurpose": "assertionMethod",
-    "verificationMethod": "did:example:issuer#keys-1"
-  }
-}
-```
-
-## W3C Verifiable Presentation using external JWT proofs
-
-The following is a non-normative example of a W3C VP using the external [JWT proof format](https://www.w3.org/TR/vc-data-model/#json-web-token), i.e., standard W3C VP encoded as a JWT (base64url decoded JWT payload only):
-
-```json
-{
-  "iss": "did:example:issuer",
-  "sub": "did:example:holder",
-  "jti": "http://example.edu/credentials/3732",
-  "nbf": 1541493724,
-  "iat": 1541493724,
-  "exp": 1573029723,
-  "nonce": "=§§@34fdfd3!",
-  "vp": {
-    "@context": [
-      "https://www.w3.org/2018/credentials/v1",
-      "https://www.w3.org/2018/credentials/examples/v1"
-    ],
-    "type": [
-      "VerifiablePresentation",
-    ],
-    "verifiableCredential": [ "eyJhbGc..." ]
-  }
-}
-```
-
-## W3C Verifiable Presentation using internal proof
-The following is a non-normative example of a W3C VP using the internal proof format. The proof property contains a JSON-LD Proof and uses the detached JWS encoding for the signature representation.
-
-In this case the OP selectively disclosed claims from a credential compatible with the eIDAS trust framework as requested by the RP (a swedish id card). 
-
-```json
-{
-  "@context": [
-    "https://www.w3.org/2018/credentials/v1"
-  ],
-  "type": [
-    "VerifiablePresentation"
-  ],
-  "verifiableCredential": [
+  {
+   "sub": "248289761001",
+   "name": "Jane Doe",
+   "given_name": "Jane",
+   "family_name": "Doe",
+   "vp_ldp":[
     {
-      "@context": [
-        "https://www.w3.org/2018/credentials/v1",
-        "https://www.w3.org/2018/credentials/examples/v1"
+      "@context":[
+         "https://www.w3.org/2018/credentials/v1"
       ],
-      "id": "https://example.com/credentials/1872",
-      "type": [
-        "VerifiableCredential",
-        "IDCardCredential"
+      "type":[
+         "VerifiablePresentation"
       ],
-      "issuer": {
-        "id": "did:example:issuer"
-      },
-      "issuanceDate": "2010-01-01T19:23:24Z",
-      "credentialSubject": {
-        "given_name": "Fredrik",
-        "family_name": "Strömberg",
-        "birthdate": "1949-01-22"
-      },
-      "proof": {
-        "type": "Ed25519Signature2018",
-        "created": "2021-03-19T15:30:15Z",
-        "jws": "eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..PT8yCqVjj5ZHD0W36zsBQ47oc3El07WGPWaLUuBTOT48IgKI5HDoiFUt9idChT_Zh5s8cF_2cSRWELuD8JQdBw",
-        "proofPurpose": "assertionMethod",
-        "verificationMethod": "did:example:issuer#keys-1"
+      "verifiableCredential":[
+         {
+            "@context":[
+               "https://www.w3.org/2018/credentials/v1",
+               "https://www.w3.org/2018/credentials/examples/v1"
+            ],
+            "id":"https://example.com/credentials/1872",
+            "type":[
+               "VerifiableCredential",
+               "IDCardCredential"
+            ],
+            "issuer":{
+               "id":"did:example:issuer"
+            },
+            "issuanceDate":"2010-01-01T19:23:24Z",
+            "credentialSubject":{
+               "given_name":"Fredrik",
+               "family_name":"Strömberg",
+               "birthdate":"1949-01-22"
+            },
+            "proof":{
+               "type":"Ed25519Signature2018",
+               "created":"2021-03-19T15:30:15Z",
+               "jws":"eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..PT8yCqVjj5ZHD0W36zsBQ47oc3El07WGPWaLUuBTOT48IgKI5HDoiFUt9idChT_Zh5s8cF_2cSRWELuD8JQdBw",
+               "proofPurpose":"assertionMethod",
+               "verificationMethod":"did:example:issuer#keys-1"
+            }
+         }
+      ],
+      "id":"ebc6f1c2",
+      "holder":"did:example:holder",
+      "proof":{
+         "type":"Ed25519Signature2018",
+         "created":"2021-03-19T15:30:15Z",
+         "challenge":"()&)()0__sdf",
+         "jws":"eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..GF5Z6TamgNE8QjE3RbiDOj3n_t25_1K7NVWMUASe_OEzQV63GaKdu235MCS3hIYvepcNdQ_ZOKpGNCf0vIAoDA",
+         "proofPurpose":"authentication",
+         "verificationMethod":"did:example:holder#key-1"
       }
-    }
-  ],
-  "id": "ebc6f1c2",
-  "holder": "did:example:holder",
-  "proof": {
-    "type": "Ed25519Signature2018",
-    "created": "2021-03-19T15:30:15Z",
-    "challenge": "()&)()0__sdf",
-    "jws": "eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..GF5Z6TamgNE8QjE3RbiDOj3n_t25_1K7NVWMUASe_OEzQV63GaKdu235MCS3hIYvepcNdQ_ZOKpGNCf0vIAoDA",
-    "proofPurpose": "authentication",
-    "verificationMethod": "did:example:holder#key-1"
+    ]
   }
-}
 ```
 
-# Alternatives
-- embedded VC as JWT: https://hackmd.io/wljYjkzfTmKVW0bX91o_Iw?view
-
-# Design Considerations
-The design choosen has the following advantages:
-- It is a clean design, which separates processing of verifiable presentations (vp_token)  and the id_token. 
-- It extends OpenID Connect to support Verifiable Presentations/Credentials while leveraging all the established mechanisms of the OpenID Connect protocol.
-- Offers balanced solution for both JSON and JSON-LD representations. no special treatment per proof-format. Both, JWT-based and LD-Proof-based VPs can be represented in `vp_token`.
-
-Other design options had been discussed, e.g. adding the verifiable presentation as claim to the id_token. In comparison to those options, the vp_token design has the following drawbacks:
-  - implementing processing additional top-level property is expected to be slightly more complicated for RPs than adding support for additional property within id_token as in proposal 2 (TLT: is this assessment based on implementation experience?)
-  - integrating vp_token support into existing OP implementations by way of customization might be complicated. E.g., Auth0 does not allow customization rules for that. So vp_token support might require direct product/library support.
-
-[TLT: is this section really required? I have never read another spec discussing design options.](/JbGT4u_2QA-t2IkfRCDFMg)
 
 ### Related Issues
 - https://bitbucket.org/openid/connect/issues/1206/how-to-support-ld-proofs-in-verifiable#comment-60051830
