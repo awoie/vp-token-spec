@@ -362,9 +362,9 @@ A Verifiable Credential embedded in an ID Token is requested by adding a element
 
 ---
 
-Was not sure if it was ok to take out these examples
+Was not sure if it was ok to take out following four examples
 
-## vc encoding options
+## VC encoding options
 
 ### W3C Verifiable Credential in JWT format using external JWT proof
 
