@@ -2,7 +2,7 @@
 
 ## Abstract
 
-This specification defines additional parameters `vp_jwt`, `vp_ldp`, `vc_jwt`, `vc_ldp` to allow presentation of claims in the form of W3C Verifiable Credentials objects as part of the OpenID Connect protocol flow.
+This specification defines an extension of OpenID Connect to allow presentation of claims in the form of W3C Verifiable Credentials as part of the protocol flow in addition to claims provided in the `id_token` and/or via Userinfo responses.
 
 ## Authors
 
@@ -67,15 +67,14 @@ This approach dramatically reduces latency and reduces load on the OP's servers.
 
 ## Overview
 
-This specifications introduces the following mechanisms to provide VCs and VPs to RPs:
+Verifiable Credentials and Verifiable Presentations can be added to a OpenID Connect UserInfo response or an ID Token.
 
-* JWTs such as ID Tokens may contain a claim `vp_jwt`, `vp_ldp`, `vc_jwt`, or `vc_ldp`.
-* Sets of JSON claims that can be returned from the endpoints such as UserInfo endpoint may contain a claim `vp_jwt`, `vp_ldp`, `vc_jwt`, or `vc_ldp`.
+OAuth Authorization Servers can add `vp_jwt`, `vp_ldp`, `vc_jwt`, or `vc_ldp` claims to ID tokens in JWT format or UserInfo responses either in plain JSON or JWT-protected format.
 
-Note that OP would first encode VPs/VCs using the rules defined in the Verifiable Credential specification either in JWT format or JSON-LD format, before passing encoded VPs/VCs as `vp_jwt`, `vp_ldp`, `vc_jwt`, or `vc_ldp` parameters as JWT claims or as sets of JSON claims.
+An OP or AS MAY also include `vp_jwt`, `vp_ldp`, `vc_jwt`, or `vc_ldp` claims in the beforementioned assertions as aggregated or distributed claims (see Section 5.6.2 of the OpenID Connect specification [OpenID]).
 
 
-# JWT Claims to represent W3C Verifiable Credentials objects
+## ID Token Extensions
 
 W3C Verifiable Credentials specification defines two kinds of objects – Verifiable Credentials and Verifiable Presentations, and it also orthogonally defines two proof formats of these objects – JWT and Linked Data Proofs. Thus, there are four data types that different use cases could utilize.
  
@@ -98,12 +97,80 @@ This table shows the different combinations of covered by the claims defined in 
 | Object included in the claim | verifiable credential | verifiable presentation | verifiable credential | verifiable presentation 
 | Proof format on the object| JWT | JWT | LD-Proof | LD-Proof
 
+There are multiple candidates for requesting verifiable presentations and verifiable credentials using OpenID Connect flows: Edmund's Aggregated Claims draft, DIF Presentation Exchange, below draft, and probably others. This would be a natural next step after defining claims, and agreeing on the request syntax should be separate from agreeing on the usage of the above four claims.
 
-# W3C Verifiable Credentials objects returned with JWTs 
+
+## Requesting Verifiable Presentations
+
+A RP requests a Verifiable Presentation using the `claims` parameter. 
+
+### Verifiable Presentation object in id_token
+
+A Verifiable Presentation embedded in an ID Token is requested by adding a element `vp_jwt` or `vp_ldp` to the `id_token` top level element of the `claims` parameter. This element must contain the following element:
+
+`credential_types`
+A string array containing a list of VC credential types the RP asks for. The OP shall respond with a presentation containing one credential of one of the listed types. 
+
+Here is a non-normative example with `vp_jwt` claim: 
+
+```json
+{
+   "id_token":{
+      "acr":null,
+      "vp_jwt":{
+         "credential_types":[
+            "https://www.w3.org/2018/credentials/examples/v1/IDCardCredential"
+         ]
+      }
+   }
+}
+```
+
+### Verifiable Credential object in id_token
+
+A Verifiable Credential embedded in an ID Token is requested by adding a element `vc_jwt` or `vc_ldp` to the `id_token` top level element of the `claims` parameter. This element must contain a `credential_types` sub element as defined above.
+
+Note that OP would first encode VPs/VCs using the rules defined in the Verifiable Credential specification either in JWT format or JSON-LD format, before passing encoded VPs/VCs as `vp_jwt`, `vp_ldp`, `vc_jwt`, or `vc_ldp` parameters as JWT claims or as sets of JSON claims.
+
+#  Request Examples 
 This section illustrates the response when W3C Verifiable Credentials objects are returned with JTWs such as inside ID Token.
 
-## Self-Issued OP Response
-Below are the examples when W3C Verifiable Credentials are returned inside ID Token as part of Self-Issued OP response. ID Token contains a `vp_jwt` or `vp_ldp` element with the Verifiable Presentation data, or a `vc_jwt` or `vc_ldp` element with the Verifiable Credential data. 
+## Self-Issued OP with Verifiable Presentation in ID Token
+Below are the examples when W3C Verifiable Credentials are requested and returned inside ID Token as part of Self-Issued OP response. ID Token contains a `vp_jwt` or `vp_ldp` element with the Verifiable Presentation data, or a `vc_jwt` or `vc_ldp` element with the Verifiable Credential data. 
+
+### Authentication request
+
+The following is a non-normative example of how an RP would use the `claims` parameter to request the `vp_jwt` claim in the `id_token`:
+
+```
+  HTTP/1.1 302 Found
+  Location: openid://?
+    response_type=id_token
+    &client_id=https%3A%2F%2Fclient.example.org%2Fcb
+    &redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb
+    &scope=openid
+    &claims=claims=%7B%22id_token%22%3A%7B%22vc%22%3A%7B%22types%22%3A%5B%22https%3A%2F%
+     2Fdid.itsourweb.org%3A3000%2Fsmart-credential%2FOntario-Health-Insurance-Plan
+     %22%5D%7D%7D%7D
+    &state=af0ifjsldkj
+    &nonce=960848874
+    &registration_uri=https%3A%2F%2F
+      client.example.org%2Frf.txt%22%7D
+      
+```
+#### claims parameter
+
+In this case, the RP asks the OP to provide a VC of a certain type.  
+
+```
+{
+    "id_token": {
+      "vp_jwt": {
+        "credential_types": ["https://did.itsourweb.org:3000/smartcredential/Ontario-Health-Insurance-Plan"]
+      } 
+    }
+}
+```
 
 ### ID Token with Verifiable Credentials signed as JWTs
 
@@ -115,11 +182,11 @@ Below is a non-normative example of ID Token that includes `vp_jwt` claim.
   "typ": "JWT",
   "alg": "ES256K"
 }.{
-   "iss":"https://book.itsourweb.org:3000/wallet/wallet.html",
+   "iss":"https://self-issued.me",
    "aud":"https://book.itsourweb.org:3000/client_api/authresp/uhn",
    "iat":1615910538,
    "exp":1615911138,
-   "sub":""did:ion:EiC6Y9_aDaCsITlY06HId4seJjJ-9...mS3NBIn19",
+   "sub":"did:ion:EiC6Y9_aDaCsITlY06HId4seJjJ-9...mS3NBIn19",
    "auth_time":1615910535,
    "nonce":"960848874",
    "vp_jwt":[
@@ -140,8 +207,7 @@ Note that `vp` is used to contain only "those parts of the standard verifiable p
 
 ```
   {
-    "iss":"urn:uuid:68f874e2-377c-437f-a447-b304967ca351",
-    "jti":"urn:uuid:68f874e2-377c-437f-a447-b304967ca351",
+    "iss":"did:ion:EiC6Y9_aDaCsITlY06HId4seJjJ...b1df31ec42d0",
     "aud":"https://book.itsourweb.org:3000/ohip",
     "iat":1615910538,
     "exp":1615911138,   
@@ -168,11 +234,11 @@ Below is a non-normative example of ID Token that includes `vp_ldp` claim.
 
 ```
 {
-   "iss":"https://book.itsourweb.org:3000/wallet/wallet.html",
+   "iss":"https://self-issued.me",
    "aud":"https://book.itsourweb.org:3000/client_api/authresp/uhn",
    "iat":1615910538,
    "exp":1615911138,
-   "sub":"urn:uuid:68f874e2-377c-437f-a447-b304967ca351",
+   "sub":"did:ion:EiC6Y9_aDaCsITlY06HId4seJjJ...b1df31ec42d0",
    "auth_time":1615910535,
    "vp_ldp":[
      {
@@ -234,11 +300,71 @@ Below is a non-normative example of ID Token that includes `vp_ldp` claim.
 ```
 
 
-# W3C Verifiable Credentials objects returned as sets of JSON claims (backchannel)
-This section illustrates the response when W3C Verifiable Credentials objects are returned as sets of JSON claims such as user_info endpoint responses.
+# Authorization COde Flow
+This section illustrates the response when W3C Verifiable Credentials objects are returned as JWTs from user_info endpoint responses.
 
-## UserInfo Response
-Below are the examples when W3C Verifiable Credentials are returned from user_info endpoint utilizing the authorization code flow.
+### Authentication Request
+
+```
+  GET /authorize?
+    response_type=code
+    &client_id=s6BhdRkqt3 
+    &redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb
+    &scope=openid
+    &claims=...
+    &state=af0ifjsldkj
+    &nonce=n-0S6_WzA2Mj HTTP/1.1
+  Host: server.example.com
+```
+
+#### Claims parameter
+
+```json
+{
+    "vp_ldp": {
+      "claims":
+      {
+        "given_name": null,
+        "family_name": null,
+        "birthdate": null
+      }
+    }
+}
+```
+
+### Authentication Response
+```
+HTTP/1.1 302 Found
+  Location: https://client.example.org/cb?
+    code=SplxlOBeZQQYbYS6WxSbIA
+    &state=af0ifjsldkj
+```
+
+### Token Request
+```
+  POST /token HTTP/1.1
+  Host: server.example.com
+  Content-Type: application/x-www-form-urlencoded
+  Authorization: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW
+
+  grant_type=authorization_code
+  &code=SplxlOBeZQQYbYS6WxSbIA
+  &redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb
+```
+### Token Response
+
+### id_token
+
+```json
+{
+  "iss": "http://server.example.com",
+  "sub": "248289761001",
+  "aud": "s6BhdRkqt3",
+  "nonce": "n-0S6_WzA2Mj",
+  "exp": 1311281970,
+  "iat": 1311280970
+}
+```
 
 ### UserInfo Response with with Verifiable Presentation signed as JWTs
 
@@ -320,49 +446,6 @@ Below is a non-normative example of a UserInfo Response that includes `vp_ldp` c
     ]
   }
 ```
-
-
----
-
-# Appendix?
-
-There are multiple candidates for requesting verifiable presentations and verifiable credentials using OpenID Connect flows: Edmund's Aggregated Claims draft, DIF Presentation Exchange, below draft, and probably others. This would be a natural next step after defining claims, and agreeing on the request syntax should be separate from agreeing on the usage of the above four claims.
-
-## Requesting Verifiable Presentations
-
-A RP requests a Verifiable Presentation using the `claims` parameter. 
-
-### Verifiable Presentation object in id_token
-
-A Verifiable Presentation embedded in an ID Token is requested by adding a element `vp_jwt` or `vp_ldp` to the `id_token` top level element of the `claims` parameter. This element must contain the following element:
-
-`credential_types`
-A string array containing a list of VC credential types the RP asks for. The OP shall respond with a presentation containing one credential of one of the listed types. 
-
-Here is a non-normative example with `vp_jwt` claim: 
-
-```json
-{
-   "id_token":{
-      "acr":null,
-      "vp_jwt":{
-         "credential_types":[
-            "https://www.w3.org/2018/credentials/examples/v1/IDCardCredential"
-         ]
-      }
-   }
-}
-```
-
-### Verifiable Credential object in id_token
-
-A Verifiable Credential embedded in an ID Token is requested by adding a element `vc_jwt` or `vc_ldp` to the `id_token` top level element of the `claims` parameter. This element must contain a `credential_types` sub element as defined above.
-
-
-
----
-
-Was not sure if it was ok to take out following four examples
 
 ## VC encoding options
 
