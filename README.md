@@ -1,4 +1,4 @@
-# OpenID Connect for Verifiable Credential presentation
+# OpenID Connect for W3C Verifiable Credential Objects
 
 ## Abstract
 
