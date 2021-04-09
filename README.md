@@ -324,13 +324,15 @@ Below is a non-normative example of a UserInfo Response that includes `vp_ldp` c
 
 ---
 
-//There are multiple candidates for requesting verifiable presentations and verifiable credentials using OpenID Connect flows: Edmund's Aggregated Claims draft, DIF Presentation Exchange, below draft, and probably others. This would be a natural next step after defining claims, and agreeing on the request syntax should be separate from agreeing on the usage of the above four claims.
+# Appendix?
 
-# Requesting Verifiable Presentations
+There are multiple candidates for requesting verifiable presentations and verifiable credentials using OpenID Connect flows: Edmund's Aggregated Claims draft, DIF Presentation Exchange, below draft, and probably others. This would be a natural next step after defining claims, and agreeing on the request syntax should be separate from agreeing on the usage of the above four claims.
+
+## Requesting Verifiable Presentations
 
 A RP requests a Verifiable Presentation using the `claims` parameter. 
 
-## Verifiable Presentation object in id_token
+### Verifiable Presentation object in id_token
 
 A Verifiable Presentation embedded in an ID Token is requested by adding a element `vp_jwt` or `vp_ldp` to the `id_token` top level element of the `claims` parameter. This element must contain the following element:
 
@@ -352,7 +354,7 @@ Here is a non-normative example with `vp_jwt` claim:
 }
 ```
 
-## Verifiable Credential object in id_token
+### Verifiable Credential object in id_token
 
 A Verifiable Credential embedded in an ID Token is requested by adding a element `vc_jwt` or `vc_ldp` to the `id_token` top level element of the `claims` parameter. This element must contain a `credential_types` sub element as defined above.
 
@@ -362,9 +364,9 @@ A Verifiable Credential embedded in an ID Token is requested by adding a element
 
 Was not sure if it was ok to take out these examples
 
-# vc encoding options
+## vc encoding options
 
-## W3C Verifiable Credential in JWT format using external JWT proof
+### W3C Verifiable Credential in JWT format using external JWT proof
 
 The following is a non-normative example of a W3C VC using the external [JWT proof format](https://www.w3.org/TR/vc-data-model/#json-web-token), i.e., standard W3C VC encoded as a JWT (base64url decoded JWT payload only). 
 
@@ -405,7 +407,7 @@ In this case the OP released a credential compatible with the eIDAS trust framew
 }
 ```
 
-## W3C Verifiable Credential in JSON-LD format using internal proof
+### W3C Verifiable Credential in JSON-LD format using internal proof
 
 The following is a non-normative example of a W3C VC using the internal proof format. The proof property contains a JSON-LD Proof and uses the detached JWS encoding for the signature representation.
 
@@ -451,9 +453,9 @@ In this case the OP released a credential compatible with the eIDAS trust framew
 }
 ```
 
-# VP encoding options
+## VP encoding options
 
-## W3C Verifiable Presentation in JWT format using external JWT proof
+### W3C Verifiable Presentation in JWT format using external JWT proof
 
 The following is a non-normative example of a W3C VP using the external [JWT proof format](https://www.w3.org/TR/vc-data-model/#json-web-token), i.e., standard W3C VP encoded as a JWT (base64url decoded JWT payload only):
 
@@ -479,7 +481,7 @@ The following is a non-normative example of a W3C VP using the external [JWT pro
 }
 ```
 
-## W3C Verifiable Presentation in JSON-LD format using internal proof
+### W3C Verifiable Presentation in JSON-LD format using internal proof
 The following is a non-normative example of a W3C VP using the internal proof format. The proof property contains a JSON-LD Proof and uses the detached JWS encoding for the signature representation.
 
 In this case the OP selectively disclosed claims from a credential compatible with the eIDAS trust framework as requested by the RP (a swedish id card). 
