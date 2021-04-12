@@ -97,7 +97,7 @@ This table shows the different combinations of covered by the claims defined in 
 | Object included in the claim | verifiable credential | verifiable presentation | verifiable credential | verifiable presentation 
 | Proof format on the object| JWT | JWT | LD-Proof | LD-Proof
 
-There are multiple candidates for requesting verifiable presentations and verifiable credentials using OpenID Connect flows: Edmund's Aggregated Claims draft, DIF Presentation Exchange, below draft, and probably others. This would be a natural next step after defining claims, and agreeing on the request syntax should be separate from agreeing on the usage of the above four claims.
+The next section illustrates how the `claims` parameter can be used for requesting verified presentations. It serves as a starting point to drive discussion about this aspect. There are other candidate approaches for this purpose. They will be evaluated as this draft evolves. 
 
 
 ## Requesting Verifiable Presentations
