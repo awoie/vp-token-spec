@@ -1,4 +1,4 @@
-# OpenID Connect for Verifiable Credential presentation
+# OpenID Connect for W3C Verifiable Credential Objects
 
 ## Abstract
 
@@ -29,6 +29,10 @@ Data derived from one or more verifiable credentials, issued by one or more issu
 Verified Presentation
 
 A verifiable presentation is a tamper-evident presentation encoded in such a way that authorship of the data can be trusted after a process of cryptographic verification. Certain types of verifiable presentations might contain data that is synthesized from, but do not contain, the original verifiable credentials (for example, zero-knowledge proofs). (see https://www.w3.org/TR/vc-data-model/#terminology)
+
+W3C Verifiable Credential Objects
+
+Both verifiable credential and verifiable presentation
 
 ## Introduction
 
@@ -97,14 +101,14 @@ This table shows the different combinations of covered by the claims defined in 
 | Object included in the claim | verifiable credential | verifiable presentation | verifiable credential | verifiable presentation 
 | Proof format on the object| JWT | JWT | LD-Proof | LD-Proof
 
+
+## Requesting W3C Verifiable Credential Objects 
+
+### Requesting W3C Verifiable Credential Objects using the `claims` parameter
+
 The next section illustrates how the `claims` parameter can be used for requesting verified presentations. It serves as a starting point to drive discussion about this aspect. There are other candidate approaches for this purpose. They will be evaluated as this draft evolves. 
 
-
-## Requesting Verifiable Presentations
-
-A RP requests a Verifiable Presentation using the `claims` parameter. 
-
-### Verifiable Presentation object in id_token
+#### Requesting Verifiable Presentations
 
 A Verifiable Presentation embedded in an ID Token is requested by adding a element `vp_jwt` or `vp_ldp` to the `id_token` top level element of the `claims` parameter. This element must contain the following element:
 
@@ -126,19 +130,22 @@ Here is a non-normative example with `vp_jwt` claim:
 }
 ```
 
-### Verifiable Credential object in id_token
+### Requesting Verifiable Credentials
 
 A Verifiable Credential embedded in an ID Token is requested by adding a element `vc_jwt` or `vc_ldp` to the `id_token` top level element of the `claims` parameter. This element must contain a `credential_types` sub element as defined above.
 
 Note that OP would first encode VPs/VCs using the rules defined in the Verifiable Credential specification either in JWT format or JSON-LD format, before passing encoded VPs/VCs as `vp_jwt`, `vp_ldp`, `vc_jwt`, or `vc_ldp` parameters as JWT claims or as sets of JSON claims.
 
-#  Request Examples 
-This section illustrates the response when W3C Verifiable Credentials objects are returned with JTWs such as inside ID Token.
 
-## Self-Issued OP with Verifiable Presentation in ID Token
-Below are the examples when W3C Verifiable Credentials are requested and returned inside ID Token as part of Self-Issued OP response. ID Token contains a `vp_jwt` or `vp_ldp` element with the Verifiable Presentation data, or a `vc_jwt` or `vc_ldp` element with the Verifiable Credential data. 
+##  Examples 
 
-### Authentication request
+This section illustrates examples when W3C Verifiable Credentials objects are requested using `claims` parameter and returned inside ID Tokens.
+
+### Self-Issued OP with Verifiable Presentation in ID Token
+
+Below are the examples when W3C Verifiable Credentials are requested and returned inside ID Token as part of Self-Issued OP response. ID Token contains a `vp_jwt` or `vp_ldp` element with the Verifiable Presentation data. It can also contain `vc_jwt` or `vc_ldp` element with the Verifiable Credential data. 
+
+#### Authentication request
 
 The following is a non-normative example of how an RP would use the `claims` parameter to request the `vp_jwt` claim in the `id_token`:
 
@@ -158,9 +165,9 @@ The following is a non-normative example of how an RP would use the `claims` par
       client.example.org%2Frf.txt%22%7D
       
 ```
-#### claims parameter
+#### `claims` parameter (`vp_jwt`)
 
-In this case, the RP asks the OP to provide a VC of a certain type.  
+Below is a non-normative example of how the `claims` parameter can be used for requesting verified presentations signed as a JWT.
 
 ```
 {
@@ -172,7 +179,7 @@ In this case, the RP asks the OP to provide a VC of a certain type.
 }
 ```
 
-### ID Token with Verifiable Credentials signed as JWTs
+#### Authentication Response (`vp_jwt`)
 
 Below is a non-normative example of ID Token that includes `vp_jwt` claim.
 
@@ -228,7 +235,21 @@ Note that `vp` is used to contain only "those parts of the standard verifiable p
   }
 ```
 
-### ID Token with Verifiable Presentation signed using Linked Data Proofs
+#### `claims` parameter (`vp_ldp`)
+
+Below is a non-normative example of how the `claims` parameter can be used for requesting verified presentations signed as Linked Data Proofs.
+
+```
+{
+    "id_token": {
+      "vp_ldp": {
+        "credential_types": ["https://did.itsourweb.org:3000/smartcredential/Ontario-Health-Insurance-Plan"]
+      } 
+    }
+}
+```
+
+#### Authentication Response (`vp_ldp`)
 
 Below is a non-normative example of ID Token that includes `vp_ldp` claim.
 
@@ -300,10 +321,11 @@ Below is a non-normative example of ID Token that includes `vp_ldp` claim.
 ```
 
 
-# Authorization COde Flow
-This section illustrates the response when W3C Verifiable Credentials objects are returned as JWTs from user_info endpoint responses.
+### Authorization Code Flow with Verifiable Presentation in ID Token
 
-### Authentication Request
+Below are the examples when verifiable presentation is requested and returned from user_info endpoint responses as part of OpenID Connect Authorization Code Flow. ID Token contains a `vp_jwt` or `vp_ldp` element with the Verifiable Presentation data. It can also contain `vc_jwt` or `vc_ldp` element with the Verifiable Credential data. 
+
+#### Authentication Request
 
 ```
   GET /authorize?
@@ -317,22 +339,56 @@ This section illustrates the response when W3C Verifiable Credentials objects ar
   Host: server.example.com
 ```
 
-#### Claims parameter
+#### Claims parameter (vp_jwt)
+
+Below is a non-normative example of how the `claims` parameter can be used for requesting verified presentations signed as JWT.
 
 ```json
 {
-    "vp_ldp": {
-      "claims":
-      {
-        "given_name": null,
-        "family_name": null,
-        "birthdate": null
+   "userinfo":
+    {
+      "vp_jwt": {
+        "claims":
+        {
+          "given_name": null,
+          "family_name": null,
+          "birthdate": null
+        }
       }
+    },
+   "id_token":
+    {
+     "auth_time": {"essential": true},
     }
 }
 ```
 
-### Authentication Response
+#### Claims parameter (vp_ldp)
+
+Below is a non-normative example of how the `claims` parameter can be used for requesting verified presentations signed as Linked Data Proofs.
+
+```json
+{
+   "userinfo":
+    {
+      "vp_ldp": {
+        "claims":
+        {
+          "given_name": null,
+          "family_name": null,
+          "birthdate": null
+        }
+      }
+    },
+   "id_token":
+    {
+     "auth_time": {"essential": true},
+    }
+}
+```
+
+#### Authentication Response
+
 ```
 HTTP/1.1 302 Found
   Location: https://client.example.org/cb?
@@ -340,7 +396,8 @@ HTTP/1.1 302 Found
     &state=af0ifjsldkj
 ```
 
-### Token Request
+#### Token Request
+
 ```
   POST /token HTTP/1.1
   Host: server.example.com
@@ -351,9 +408,10 @@ HTTP/1.1 302 Found
   &code=SplxlOBeZQQYbYS6WxSbIA
   &redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb
 ```
-### Token Response
 
-### id_token
+#### Token Response
+
+##### id_token
 
 ```json
 {
@@ -362,11 +420,12 @@ HTTP/1.1 302 Found
   "aud": "s6BhdRkqt3",
   "nonce": "n-0S6_WzA2Mj",
   "exp": 1311281970,
-  "iat": 1311280970
+  "iat": 1311280970,
+  "auth_time":1615910535
 }
 ```
 
-### UserInfo Response with with Verifiable Presentation signed as JWTs
+##### UserInfo Response (vp_jwt)
 
 Below is a non-normative example of a UserInfo Response that includes `vp_jwt` claim:
 
@@ -383,7 +442,7 @@ Below is a non-normative example of a UserInfo Response that includes `vp_jwt` c
   }
 ```
 
-### UserInfo Response with Verifiable Presentation signed using Linked Data Proofs
+### UserInfo Response  (vp_ldp)
 
 Below is a non-normative example of a UserInfo Response that includes `vp_ldp` claim:
 
