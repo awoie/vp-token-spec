@@ -403,12 +403,12 @@ This example shows an ID Token containing a reference to a verifiable presentati
 The RP obtains the verifiable presentation by sending a GET request to URL in the `endpoint` element. 
 
 ```
-  GET /presentations/1234564 HTTP/1.1
-  Host: op.example.com
-  Authorization: BEARER ksj3n283dkeafb76cdef
+GET /presentations/1234564 HTTP/1.1
+Host: op.example.com
+Authorization: BEARER ksj3n283dkeafb76cdef
 
-  HTTP/1.1 200 OK
-  Content-Type: application/jwt
+HTTP/1.1 200 OK
+Content-Type: application/jwt
 
 eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL3NlcnZlci5vdGhlcm9wLmNvbSIsInN1YiI6ImU4MTQ4NjAzLTg5MzQtNDI0NS04MjViLWMxMDhiOGI2Yjk0NSIsInZlcmlmaWVkX2NsYWltcyI6eyJ2ZXJpZmljYXRpb24iOnsidHJ1c3RfZnJhbWV3b3JrIjoiaWFsX2V4YW1wbGVfZ29sZCJ9LCJjbGFpbXMiOnsiZ2l2ZW5fbmFtZSI6Ik1heCIsImZhbWlseV9uYW1lIjoiTWVpZXIiLCJiaXJ0aGRhdGUiOiIxOTU2LTAxLTI4In19fQ.FArlPUtUVn95HCExePlWJQ6ctVfVpQyeSbe3xkH9MH1QJjnk5GVbBW0qe1b7R3lE-8iVv__0mhRTUI5lcFhLjoGjDS8zgWSarVsEEjwBK7WD3r9cEw6ZAhfEkhHL9eqAaED2rhhDbHD5dZWXkJCuXIcn65g6rryiBanxlXK0ZmcK4fD9HV9MFduk0LRG_p4yocMaFvVkqawat5NV9QQ3ij7UBr3G7A4FojcKEkoJKScdGoozir8m5XD83Sn45_79nCcgWSnCX2QTukL8NywIItu_K48cjHiAGXXSzydDm_ccGCe0sY-Ai2-iFFuQo2PtfuK2SqPPmAZJxEFrFoLY4g  
 ```
@@ -604,12 +604,12 @@ The presentation can also be provided using a distributed claims source.
 The RP obtains the presentation by sending a GET request to the URL denoted in `endpoint`.
 
 ```
-  GET /presentations/1234564 HTTP/1.1
-  Host: op.example.com
-  Authorization: BEARER ksj3n283dkeafb76cdef
+GET /presentations/1234564 HTTP/1.1
+Host: op.example.com
+Authorization: BEARER ksj3n283dkeafb76cdef
 
-  HTTP/1.1 200 OK
-  Content-Type: application/ld+json
+HTTP/1.1 200 OK
+Content-Type: application/ld+json
 
 {
    "format":"vp_ldp",
