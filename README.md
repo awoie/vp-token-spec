@@ -316,7 +316,7 @@ The ID Token contains a `src1` element with the Verifiable Credential data.
       "y":"38VlVE3kNiMEjklFe4Wo4DqdTKkFbK6QrmZf77lCMN2x9bENZoGF2EYFiBsOsnq0"
    },
    "_credential_types":{
-      "https://www.w3.org/2018/credentials/examples/v1/AlumniCredential":[
+      "https://www.w3.org/2018/credentials/examples/v1/IDCardCredential":[
          "src1"
       ]
    },
@@ -386,7 +386,7 @@ This example shows an ID Token containing a reference to a verifiable presentati
       "y":"38VlVE3kNiMEjklFe4Wo4DqdTKkFbK6QrmZf77lCMN2x9bENZoGF2EYFiBsOsnq0"
    },
    "_credential_types":{
-      "https://www.w3.org/2018/credentials/examples/v1/AlumniCredential":[
+      "https://www.w3.org/2018/credentials/examples/v1/IDCardCredential":[
          "src1"
       ]
    },
@@ -396,7 +396,7 @@ This example shows an ID Token containing a reference to a verifiable presentati
          "endpoint":"https://op.example.com/presentations/1234564",
          "access_token":"ksj3n283dkeafb76cdef"
       }
-   }
+   }  
 }
 ```
 
@@ -587,7 +587,7 @@ The presentation can also be provided using a distributed claims source.
       "y":"38VlVE3kNiMEjklFe4Wo4DqdTKkFbK6QrmZf77lCMN2x9bENZoGF2EYFiBsOsnq0"
    },
    "_credential_types":{
-      "https://www.w3.org/2018/credentials/examples/v1/AlumniCredential":[
+      "https://www.w3.org/2018/credentials/examples/v1/IDCardCredential":[
          "src1"
       ]
    },
