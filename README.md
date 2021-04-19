@@ -94,7 +94,6 @@ Here is are examples requesting verifiable credential to be added to the ID Toke
 ```json
 {
    "id_token":{
-      "acr":null,
       "verifiable_credential":{
          "credential_types":[
             "https://www.w3.org/2018/credentials/examples/v1/IDCardCredential"
@@ -120,7 +119,6 @@ Here is an example:
 ```json
 {
    "id_token":{
-      "acr":null,
       "verifiable_presentation":{
         "credential_types":[
          {
@@ -132,6 +130,21 @@ Here is an example:
             }
          }
       ]
+}
+```
+### Requesting Claims
+
+The RP MAY request End-User claims using the syntax as defined in the OpenID Connect Core. In this case, the OP may decide whether these claims are provided as OpenID Connect claims or via a Verifiable Presentation. 
+
+Here is an example:
+
+```json
+{
+   "id_token":{
+      "given_name":null,
+      "family_name":null,
+      "birthdate":null
+   }
 }
 ```
 
