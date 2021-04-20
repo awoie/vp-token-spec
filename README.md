@@ -606,7 +606,7 @@ The presentation can also be provided using a distributed claims source.
    },
    "_claim_sources":{
      "src1":{
-         "format":"vp_jwt",
+         "format":"vp_ldp",
          "endpoint":"https://op.example.com/presentations/1234564",
          "access_token":"ksj3n283dkeafb76cdef"
       }
