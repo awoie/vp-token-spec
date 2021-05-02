@@ -194,9 +194,9 @@ Verifiable credential objects can be exchanged between OP and RP enveloped in JW
 
 This specification introduces the following JWT claims for that purpose:
 
-- `verifiable_credentials`:  A claim whose value is a verifiable credentials container object es defined above. 
+- `verifiable_credentials`:  A claim whose value is a verifiable credentials container object as defined above. 
 
-- `verifiable_presentations`:  A claim whose value is a verifiable presentations container object es defined above.
+- `verifiable_presentations`:  A claim whose value is a verifiable presentations container object as defined above.
 
 These claims can be added to ID Tokens, Userinfo responses as well as Access Tokens and Introspection response. They MAY also be included as aggregated or distributed claims (see Section 5.6.2 of the OpenID Connect specification [OpenID]).
 
