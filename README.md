@@ -48,8 +48,8 @@ There are two credential formats to VCs and VPs: JSON or JSON-LD. There are also
 
 This specification introduces the following mechanisms to exchange verifiable credentials objectes between OpenID OPs and RPs.
 
-* JWT claims (`verifiable_presentations` and `verifiable_credentials`) used as genetic container objects to embed verifieble credential objects into ID tokens or userinfo responses.
-* New tokens types VP Token and VC Token contain verifiable credentials objectes
+* JWT claims (`verifiable_presentations` and `verifiable_credentials`) used as generic container objects to embed verifiable credential objects into ID tokens or userinfo responses.
+* New token types VP Token and VC Token contain verifiable credentials objects.
 
 Applications can use all beforementioned assertion and proof formats with this specification. 
 
