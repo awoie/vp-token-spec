@@ -18,7 +18,7 @@ Credential
 
 A set of one or more claims made by an issuer. (see https://www.w3.org/TR/vc-data-model/#terminology)
 
-Verifiable Credential
+Verifiable Credential (VC)
 
 A verifiable credential is a tamper-evident credential that has authorship that can be cryptographically verified. Verifiable credentials can be used to build verifiable presentations, which can also be cryptographically verified. The claims in a credential can be about different subjects. (see https://www.w3.org/TR/vc-data-model/#terminology)
 
@@ -26,7 +26,7 @@ Presentation
 
 Data derived from one or more verifiable credentials, issued by one or more issuers, that is shared with a specific verifier. (see https://www.w3.org/TR/vc-data-model/#terminology)
 
-Verified Presentation
+Verified Presentation (VP)
 
 A verifiable presentation is a tamper-evident presentation encoded in such a way that authorship of the data can be trusted after a process of cryptographic verification. Certain types of verifiable presentations might contain data that is synthesized from, but do not contain, the original verifiable credentials (for example, zero-knowledge proofs). (see https://www.w3.org/TR/vc-data-model/#terminology)
 
@@ -37,21 +37,6 @@ Both verifiable credentials and verifiable presentations
 ## Introduction
 
 This specification extends OpenID Connect with support for presentation of claims via W3C Verifiable Credentials. This allows existing OpenID Connect RPs to extends their reach towards claims sources asserting claims in this format. It also allows new applications built using Verifiable Credentials to utilize OpenID Connect as integration and interoperability layer towards credential holders. 
-
-This specification supports two ways to present Verifiable Credentials. Its is possible to provide the RP directly with a Verificable Credential or to use a Verifiable Presentation.
-
-The Verifiable Credential (VC) can be used to assert claims towards a Verifier under some circumstances. Either the credential is a bearer credential, i.e. it is not bound to a certain secret that requires proof of control when presenting the credential, or the link between the subject of the credential and the presenter of the credential can be established by other means, e.g. by proofing control over the subject's DID in the same process. 
-
-Verifiable Presentations (VP) are used to present claims along with cryptographic proofs of the link between presenter and subject of the verifiable credentials it contains. A verifiable presentation can contain a subset of claims asserted in a certain credential (selective disclosure) and it can assemble claims from different credentials. 
-
-There are two credential formats to VCs and VPs: JSON or JSON-LD. There are also two proof formats to VCs and VPs: JWT and Linked Data Proofs. Each of those formats has different properties and capabilites and each of them comes with different proof types. Proof formats are agnostic to the credential format chosen. However, the JSON credential format is commonly used with JSON Web Signatures (https://www.w3.org/TR/vc-data-model/#json-web-token). JSON-LD is commonly used with different kinds of Linked Data Proofs and JSON Web Signatures (https://www.w3.org/TR/vc-data-model/#json-ld). 
-
-This specification introduces the following mechanisms to exchange verifiable credentials objectes between OpenID OPs and RPs.
-
-* JWT claims (`verifiable_presentations` and `verifiable_credentials`) used as generic container objects to embed verifiable credential objects into ID tokens or userinfo responses.
-* New token types VP Token and VC Token contain verifiable credentials objects.
-
-Applications can use all beforementioned assertion and proof formats with this specification. 
 
 ## Use Cases
 
@@ -75,33 +60,35 @@ This approach dramatically reduces latency and reduces load on the OP's servers.
 
 ## Overview 
 
-W3C Verifiable Credentials specification defines two kinds of objects – Verifiable Credentials and Verifiable Presentations, and it also orthogonally defines two proof formats of these objects – JWT and Linked Data Proofs. Thus, there are four data types that different use cases could utilize.
+This specification defines mechanisms to allow RPs to request and OPs to provide Verifiable Presentations via OpenID Connect. 
 
-This specification defines the JWT parameters to pass VPs and VCs signed as JWTs or using Linked Data Proofs.
+Verifiable Presentations are used to present claims along with cryptographic proofs of the link between presenter and subject of the verifiable credentials it contains. A verifiable presentation can contain a subset of claims asserted in a certain credential (selective disclosure) and it can assemble claims from different credentials. 
 
-This specifications also introduces a new artifact VP Token and VC Token to provide VPs and VCs to RPs.
+There are two credential formats to VCs and VPs: JSON or JSON-LD. There are also two proof formats to VCs and VPs: JWT and Linked Data Proofs. Each of those formats has different properties and capabilites and each of them comes with different proof types. Proof formats are agnostic to the credential format chosen. However, the JSON credential format is commonly used with JSON Web Signatures (https://www.w3.org/TR/vc-data-model/#json-web-token). JSON-LD is commonly used with different kinds of Linked Data Proofs and JSON Web Signatures (https://www.w3.org/TR/vc-data-model/#json-ld). Applications can use all beforementioned assertion and proof formats with this specification. 
+
+This specification introduces the following representations to exchange verifiable credentials objectes between OpenID OPs and RPs.
+
+* The JWT claim `verifiable_presentations` used as generic container to embed verifiable presentation objects into ID tokens or userinfo responses.
+* The new token types "VP Token" used as generic container for verifiable presentation objects in authentication and token responses in addition to ID Tokens.
 
 All representations share the same container format.
-
 ## Container Format
 
-### Verifiable Credential
+A verifiable presentation container is an array of objects, each of them containing the following fields:
 
-A verifiable credential container is an array of objects, each of them containing the following fields:
+`format`: REQUIRED A JSON string denoting the proof format the presentation was returned in. This specification introduces the values `jwt_vp` and `ldp_vp` to denote credentials in JSON-LD and JWT format, respectively, as defined in https://identity.foundation/presentation-exchange/.  
 
-`format`: REQUIRED A JSON string denoting the proof format the credential was returned in. This specification introduces the values `w3cvc-jsonld` and `w3cvc-jwt` to denote credentials in JSON-LD and JWT format, respectively.  
+`presentation` : REQUIRED. A W3C Verifiable Presentation with a cryptographically verifiable proof in the defined proof format. 
 
-`credential` : REQUIRED. A W3C Verifiable Credential with a cryptographically verifiable proof in the defined proof format.
-
-Note that OP would first encode VCs using the rules defined in the W3C Verifiable Credential specification either in JWT format or LD-Proof format, before encoded VCs as container objects.
+Note that OP would first encode VPs using the rules defined in the Verifiable Credential specification either in JWT format or JSON-LD format, before encoded VPs as container objects.
 
 Here is an example: 
 
 ```json
 [
    {
-      "format":"w3cvc-jwt",
-      "credential":
+      "format":"vp_jwt",
+      "presentation":
       "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImRpZDpleGFtcGxlOmFiZmUxM2Y3MTIxMjA0
       MzFjMjc2ZTEyZWNhYiNrZXlzLTEifQ.eyJzdWIiOiJkaWQ6ZXhhbXBsZTplYmZlYjFmNzEyZWJjNmYxY
       zI3NmUxMmVjMjEiLCJqdGkiOiJodHRwOi8vZXhhbXBsZS5lZHUvY3JlZGVudGlhbHMvMzczMiIsImlzc
@@ -117,24 +104,7 @@ Here is an example:
       1rx6X0-xlFBs7cl6Wt8rfBP_tZ9YgVWrQmUWypSioc0MUyiphmyEbLZagTyPlUyflGlEdqrZAv6eSe6R
       txJy6M1-lD7a5HTzanYTWBPAUHDZGyGKXdJw-W_x0IWChBzI8t3kpG253fg6V3tPgHeKXE94fz_QpYfg
       --7kLsyBAfQGbg"
-   }
-]
-```
-
-### Verifiable Presentation
-
-A verifiable presentation container is an array of objects, each of them containing the following fields:
-
-`format`: REQUIRED A JSON string denoting the proof format the presentation was returned in. This specification introduces the values `jwt_vp` and `ldp_vp` to denote credentials in JSON-LD and JWT format, respectively, as defined in https://identity.foundation/presentation-exchange/.  
-
-`presentation` : REQUIRED. A W3C Verifiable Presentation with a cryptographically verifiable proof in the defined proof format. 
-
-Note that OP would first encode VPs using the rules defined in the Verifiable Credential specification either in JWT format or JSON-LD format, before encoded VPs as container objects.
-
-Here is an example: 
-
-```json
-[
+   },
    {
       "format":"vp_ldp",
       "presentation":{
@@ -192,32 +162,26 @@ Here is an example:
 
 Verifiable credential objects can be exchanged between OP and RP enveloped in JWT claims in ID tokens or userinfo responses.  
 
-This specification introduces the following JWT claims for that purpose:
-
-- `verifiable_credentials`:  A claim whose value is a verifiable credentials container object as defined above. 
+This specification introduces the following JWT claim for that purpose:
 
 - `verifiable_presentations`:  A claim whose value is a verifiable presentations container object as defined above.
 
-These claims can be added to ID Tokens, Userinfo responses as well as Access Tokens and Introspection response. They MAY also be included as aggregated or distributed claims (see Section 5.6.2 of the OpenID Connect specification [OpenID]).
+This claim can be added to ID Tokens, Userinfo responses as well as Access Tokens and Introspection response. It MAY also be included as aggregated or distributed claims (see Section 5.6.2 of the OpenID Connect specification [OpenID]).
 
-Note that above claims have to be distinguished from `vp` or `vc` claims as defined in [JWT proof format](https://www.w3.org/TR/vc-data-model/#json-web-token). `vp` or `vc` claims contain those parts of the standard verifiable credentials and verifiable presentations where no explicit encoding rules for JWT exist. They are used as part of a verifiable credential or presentation in JWT format. They are not meant to include complete verifiable credentials or verifiable presentations objects which is the purpose of the claims defined in this specification.
+Note that above claim has to be distinguished from `vp` or `vc` claims as defined in [JWT proof format](https://www.w3.org/TR/vc-data-model/#json-web-token). `vp` or `vc` claims contain those parts of the standard verifiable credentials and verifiable presentations where no explicit encoding rules for JWT exist. They are used as part of a verifiable credential or presentation in JWT format. They are not meant to include complete verifiable credentials or verifiable presentations objects which is the purpose of the claims defined in this specification.
 
 ## New Tokens extention
 
-This specifications introduces the following new tokens:
+This specifications introduces the following new token:
 
-* VC Token: a token containing a verifiable credentials container as defined above. Such a token is provided to the RP in addition to an `id_token` in the `vc_token` parameter. 
 * VP Token: a token containing a verifiable presentations container as defined above. Such a token is provided to the RP in addition to an `id_token` in the `vp_token` parameter. 
 
-`vp_token` and/or `vc_token` are provided in the same response as the `id_token`. Depending on the response type, this can be either the authentication response or the token response. Authentication event information is conveyed via the id token while it's up to the RP to determine what (additional) claims are allocated to `id_token` and `vp_token`, respectively, via the `claims` parameter. 
+`vp_token` is provided in the same response as the `id_token`. Depending on the response type, this can be either the authentication response or the token response. Authentication event information is conveyed via the id token while it's up to the RP to determine what (additional) claims are allocated to `id_token` and `vp_token`, respectively, via the `claims` parameter. 
 
-If the `vp_token` or `vc_token` is returned in the frontchannel, a hash of the respective token MUST be included in `id_token`.
+If the `vp_token` is returned in the frontchannel, a hash of the respective token MUST be included in `id_token`.
 
 `vp_hash`
 OPTIONAL. Hash value of `vp_token` that represents the W3C VP. Its value is the base64url encoding of the left-most half of the hash of the octets of the ASCII representation of the `vp_token` value, where the hash algorithm used is the hash algorithm used in the alg Header Parameter of the ID Token's JOSE Header. For instance, if the alg is RS256, hash the vp_token value with SHA-256, then take the left-most 128 bits and base64url encode them. The `vp_hash` value is a case sensitive string.
-
-`vc_hash`
-OPTIONAL. Hash value of `vc_token` that represents the W3C VC. Its value is the base64url encoding of the left-most half of the hash of the octets of the ASCII representation of the `vc_token` value, where the hash algorithm used is the hash algorithm used in the alg Header Parameter of the ID Token's JOSE Header. For instance, if the alg is RS256, hash the `vc_token` value with SHA-256, then take the left-most 128 bits and base64url encode them. The `vc_hash` value is a case sensitive string.
 
 ## Requesting W3C Verifiable Credential Objects 
 
@@ -255,17 +219,9 @@ Here is a non-normative example:
    }
 }
 ```
-#### Requesting Verifiable Credentials
-
-A Verifiable Credential embedded in an ID Token (or userinfo response) is requested by adding a element `verifiable_credentials` to the `id_token` (or `userinfo`) top level element of the `claims` parameter. This element must contain a `credential_types` sub element as defined above.
-
 ### Requesting a VP Token
 
 A VP Token is requested by adding a new top level element `vp_token` to the `claims` parameter. This element contains the sub elements as defined above.
-
-### Requesting a VC Token
-
-A VP Token is requested by adding a new top level element `vc_token` to the `claims` parameter. This element must contain a `credential_types` sub element as defined above.
 
 ##  Examples 
 
@@ -471,7 +427,7 @@ Below is a non-normative example of ID Token that includes `verifiable_presentat
 
 ### Authorization Code Flow with Verifiable Presentation in ID Token
 
-Below are the examples when W3C Verifiable Credentials are requested and returned inside ID Token as part of Authorization Code flow. ID Token contains a `verifiable_presentations` element with the Verifiable Presentations data. It can also contain `verifiable_credentials` element with the Verifiable Credentials data. 
+Below are the examples when W3C Verifiable Credentials are requested and returned inside ID Token as part of Authorization Code flow. ID Token contains a `verifiable_presentations` element with the Verifiable Presentations data. 
 
 #### Authentication Request
 
@@ -530,7 +486,7 @@ HTTP/1.1 302 Found
 
 ### Authorization Code Flow with Verifiable Presentation returned from the UserInfo endpoint
 
-Below are the examples when verifiable presentation is requested and returned from the UserInfo endpoint as part of OpenID Connect Authorization Code Flow. UserInfo response contains a `verifiable_presentations` element with the Verifiable Presentation data. It can also contain `verifiable_credentials` element with the Verifiable Credentials data. 
+Below are the examples when verifiable presentation is requested and returned from the UserInfo endpoint as part of OpenID Connect Authorization Code Flow. UserInfo response contains a `verifiable_presentations` element with the Verifiable Presentation data. 
 
 #### Authentication Request
 
