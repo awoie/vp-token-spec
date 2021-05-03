@@ -48,8 +48,8 @@ There are two credential formats to VCs and VPs: JSON or JSON-LD. There are also
 
 This specification introduces the following mechanisms to exchange verifiable credentials objectes between OpenID OPs and RPs.
 
-* JWT claims (`verifiable_presentations` and `verifiable_credentials`) used as genetic container objects to embed verifieble credential objects into ID tokens or userinfo responses.
-* New tokens types VP Token and VC Token contain verifiable credentials objectes
+* JWT claims (`verifiable_presentations` and `verifiable_credentials`) used as generic container objects to embed verifiable credential objects into ID tokens or userinfo responses.
+* New token types VP Token and VC Token contain verifiable credentials objects.
 
 Applications can use all beforementioned assertion and proof formats with this specification. 
 
@@ -91,9 +91,9 @@ A verifiable credential container is an array of objects, each of them containin
 
 `format`: REQUIRED A JSON string denoting the proof format the credential was returned in. This specification introduces the values `w3cvc-jsonld` and `w3cvc-jwt` to denote credentials in JSON-LD and JWT format, respectively.  
 
-`credential` : REQUIRED. A cryptographically verifiable proof in the defined proof format. 
+`credential` : REQUIRED. A W3C Verifiable Credential with a cryptographically verifiable proof in the defined proof format.
 
-Note that OP would first encode VCs using the rules defined in the Verifiable Credential specification either in JWT format or JSON-LD format, before encoded VCs as container objects.
+Note that OP would first encode VCs using the rules defined in the W3C Verifiable Credential specification either in JWT format or LD-Proof format, before encoded VCs as container objects.
 
 Here is an example: 
 
@@ -123,11 +123,11 @@ Here is an example:
 
 ### Verifiable Presentation
 
-A verifiable credential container is an array of objects, each of them containing the following fields:
+A verifiable presentation container is an array of objects, each of them containing the following fields:
 
 `format`: REQUIRED A JSON string denoting the proof format the presentation was returned in. This specification introduces the values `jwt_vp` and `ldp_vp` to denote credentials in JSON-LD and JWT format, respectively, as defined in https://identity.foundation/presentation-exchange/.  
 
-`presentation` : REQUIRED. A cryptographically verifiable proof in the defined proof format. 
+`presentation` : REQUIRED. A W3C Verifiable Presentation with a cryptographically verifiable proof in the defined proof format. 
 
 Note that OP would first encode VPs using the rules defined in the Verifiable Credential specification either in JWT format or JSON-LD format, before encoded VPs as container objects.
 
@@ -273,7 +273,7 @@ This section illustrates examples when W3C Verifiable Credentials objects are re
 
 ### Self-Issued OpenID Provider with Verifiable Presentation in ID Token 
 
-Below are the examples when W3C Verifiable Credentials are requested and returned inside ID Token as part of Self-Issued OP response. ID Token contains a `verifiable_presentations` claim with the Verifiable Presentations data. It can also contain `verifiable_credentials` element with the Verifiable Credentials data. 
+Below are the examples when W3C Verifiable Credentials are requested and returned inside ID Token as part of Self-Issued OP response. ID Token contains a `verifiable_presentations` claim with the Verifiable Presentation data. It can also contain `verifiable_credentials` element with the Verifiable Credential data. 
 
 #### Authentication request
 
@@ -530,7 +530,7 @@ HTTP/1.1 302 Found
 
 ### Authorization Code Flow with Verifiable Presentation returned from the UserInfo endpoint
 
-Below are the examples when verifiable presentation is requested and returned from the UserInfo endpoint as part of OpenID Connect Authorization Code Flow. UserInfo response contains a `verifiable_presentazions` element with the Verifiable Presentation data. It can also contain `verifiable_credentials` element with the Verifiable Credentials data. 
+Below are the examples when verifiable presentation is requested and returned from the UserInfo endpoint as part of OpenID Connect Authorization Code Flow. UserInfo response contains a `verifiable_presentations` element with the Verifiable Presentation data. It can also contain `verifiable_credentials` element with the Verifiable Credentials data. 
 
 #### Authentication Request
 
