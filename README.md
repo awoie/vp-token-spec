@@ -93,7 +93,7 @@ A verifiable credential container is an array of objects, each of them containin
 
 `credential` : REQUIRED. A W3C Verifiable Credential with a cryptographically verifiable proof in the defined proof format.
 
-Note that OP would first encode VCs using the rules defined in the Verifiable Credential specification either in JWT format or JSON-LD format, before encoded VCs as container objects.
+Note that OP would first encode VCs using the rules defined in the W3C Verifiable Credential specification either in JWT format or LD-Proof format, before encoded VCs as container objects.
 
 Here is an example: 
 
