@@ -1,18 +1,87 @@
-# OpenID Connect for W3C Verifiable Credential Objects
+%%%
+title = "OpenID Connect for W3C Verifiable Credential Objects"
+abbrev = "openid-4-vp"
+ipr = "none"
+workgroup = "connect"
+keyword = ["security", "openid", "ssi"]
 
-## Abstract
+[seriesInfo]
+name = "Internet-Draft"
+value = "openid-connect-4-verifiable-presentations-00"
+status = "standard"
+
+[[author]]
+initials="O."
+surname="Terbu"
+fullname="Oliver Terbu"
+organization="ConsenSys Mesh"
+    [author.address]
+    email = "oliver.terbu@mesh.xyz"
+
+[[author]]
+initials="T."
+surname="Lodderstedt"
+fullname="Torsten Lodderstedt"
+organization="yes.com"
+    [author.address]
+    email = "torsten@lodderstedt.net"
+
+[[author]]
+initials="K."
+surname="Yasuda"
+fullname="Kristina Yasuda"
+organization="Microsoft"
+    [author.address]
+    email = "kristina.yasuda@microsoft.com"
+
+[[author]]
+initials="A."
+surname="Lemmon"
+fullname="Adam Lemmon"
+organization="Convergence.tech"
+    [author.address]
+    email = "adam@convergence.tech"
+    
+[[author]]
+initials="T."
+surname="Looker"
+fullname="Tobias Looker"
+organization="Mattr"
+    [author.address]
+    email = "tobias.looker@mattr.global"
+
+%%%
+
+.# Abstract
 
 This specification defines an extension of OpenID Connect to allow presentation of claims in the form of W3C Verifiable Credentials as part of the protocol flow in addition to claims provided in the `id_token` and/or via Userinfo responses.
 
-## Authors
+{mainmatter}
 
-- Oliver Terbu (ConsenSys Mesh)
-- Torsten Lodderstedt (yes.com)
-- Kristina Yasuda (Microsoft)
-- Adam Lemmon (Trybe.ID)
-- Tobias Looker (Mattr)
+# Introduction
 
-## Terminology
+This specification extends OpenID Connect with support for presentation of claims via W3C Verifiable Credentials. This allows existing OpenID Connect RPs to extends their reach towards claims sources asserting claims in this format. It also allows new applications built using Verifiable Credentials to utilize OpenID Connect as integration and interoperability layer towards credential holders. 
+
+# Use Cases
+
+## Verifier accesses Wallet via OpenID Connect
+
+A Verifier uses OpenID Connect to obtain verifiable presentations. This is a simple and mature way to obtain identity data. From a technical perspective, this also makes integration with OAuth-protected APIs easier as OpenID Connect is based on OAuth.  
+
+## Existing OpenID Connect RP integrates SSI wallets
+
+An application currently utilizing OpenID Connect for accessing various federated identity providers can use the same protocol to also integrate with emerging SSI-based wallets. Thats an conveient transition path leveraging existing expertise and protecting investments made.
+
+## Existing OpenID Connect OP as custodian of End-User Credentials
+
+An existing OpenID Connect may extends its service by maintaining credentials issued by other claims sources on behalf of its customers. Customers can mix claims of the OP and from their credentials to fulfil authentication requests. 
+
+## Federated OpenID Connect OP adds device-local mode
+
+An extisting OpenID Connect OP with a native user experience (PWA or native app) issues Verifiable Credentials and stores it on the user's device linked to a private key residing on this device under the user's control. For every authentication request, the native user experience first checks whether this request can be fulfilled using the locally stored credentials. If so, it generates a presentations signed with the user's keys in order to prevent replay of the credential. 
+
+This approach dramatically reduces latency and reduces load on the OP's servers. Moreover, the user can identity, authenticate, and authorize even in situations with unstable or without internet connectivity. 
+# Terminology
 
 Credential
 
@@ -33,32 +102,7 @@ A verifiable presentation is a tamper-evident presentation encoded in such a way
 W3C Verifiable Credential Objects
 
 Both verifiable credentials and verifiable presentations
-
-## Introduction
-
-This specification extends OpenID Connect with support for presentation of claims via W3C Verifiable Credentials. This allows existing OpenID Connect RPs to extends their reach towards claims sources asserting claims in this format. It also allows new applications built using Verifiable Credentials to utilize OpenID Connect as integration and interoperability layer towards credential holders. 
-
-## Use Cases
-
-### Verifier accesses Wallet via OpenID Connect
-
-A Verifier uses OpenID Connect to obtain verifiable presentations. This is a simple and mature way to obtain identity data. From a technical perspective, this also makes integration with OAuth-protected APIs easier as OpenID Connect is based on OAuth.  
-
-### Existing OpenID Connect RP integrates SSI wallets
-
-An application currently utilizing OpenID Connect for accessing various federated identity providers can use the same protocol to also integrate with emerging SSI-based wallets. Thats an conveient transition path leveraging existing expertise and protecting investments made.
-
-### Existing OpenID Connect OP as custodian of End-User Credentials
-
-An existing OpenID Connect may extends its service by maintaining credentials issued by other claims sources on behalf of its customers. Customers can mix claims of the OP and from their credentials to fulfil authentication requests. 
-
-### Federated OpenID Connect OP adds device-local mode
-
-An extisting OpenID Connect OP with a native user experience (PWA or native app) issues Verifiable Credentials and stores it on the user's device linked to a private key residing on this device under the user's control. For every authentication request, the native user experience first checks whether this request can be fulfilled using the locally stored credentials. If so, it generates a presentations signed with the user's keys in order to prevent replay of the credential. 
-
-This approach dramatically reduces latency and reduces load on the OP's servers. Moreover, the user can identity, authenticate, and authorize even in situations with unstable or without internet connectivity. 
-
-## Overview 
+# Overview 
 
 This specification defines mechanisms to allow RPs to request and OPs to provide Verifiable Presentations via OpenID Connect. 
 
@@ -72,7 +116,7 @@ This specification introduces the following representations to exchange verifiab
 * The new token types "VP Token" used as generic container for verifiable presentation objects in authentication and token responses in addition to ID Tokens.
 
 All representations share the same container format.
-## Container Format
+# Container Format
 
 A verifiable presentation container is an array of objects, each of them containing the following fields:
 
@@ -157,8 +201,7 @@ Here is an example:
    }
 ]
 ```
-
-## JWT parameters extention
+# JWT parameters extention
 
 Verifiable credential objects can be exchanged between OP and RP enveloped in JWT claims in ID tokens or userinfo responses.  
 
@@ -170,7 +213,7 @@ This claim can be added to ID Tokens, Userinfo responses as well as Access Token
 
 Note that above claim has to be distinguished from `vp` or `vc` claims as defined in [JWT proof format](https://www.w3.org/TR/vc-data-model/#json-web-token). `vp` or `vc` claims contain those parts of the standard verifiable credentials and verifiable presentations where no explicit encoding rules for JWT exist. They are used as part of a verifiable credential or presentation in JWT format. They are not meant to include complete verifiable credentials or verifiable presentations objects which is the purpose of the claims defined in this specification.
 
-## New Tokens extention
+# New Tokens extention
 
 This specifications introduces the following new token:
 
@@ -183,11 +226,11 @@ If the `vp_token` is returned in the frontchannel, a hash of the respective toke
 `vp_hash`
 OPTIONAL. Hash value of `vp_token` that represents the W3C VP. Its value is the base64url encoding of the left-most half of the hash of the octets of the ASCII representation of the `vp_token` value, where the hash algorithm used is the hash algorithm used in the alg Header Parameter of the ID Token's JOSE Header. For instance, if the alg is RS256, hash the vp_token value with SHA-256, then take the left-most 128 bits and base64url encode them. The `vp_hash` value is a case sensitive string.
 
-## Requesting W3C Verifiable Credential Objects 
+# Requesting Verifiable Presentations 
 
 This section illustrates how the `claims` parameter can be used for requesting verified presentations. It serves as a starting point to drive discussion about this aspect. There are other candidate approaches for this purpose (most notably [DIF Presentation Exchange](https://identity.foundation/presentation-exchange/). They will be evaluated as this draft evolves. 
 
-### Requesting Verifiable Presentations
+## Embedded Verifiable Presentations
 
 A Verifiable Presentation embedded in an ID Token (or userinfo response) is requested by adding an element `verifiable_presentations` to the `id_token` (or `userinfo`) top level element of the `claims` parameter. This element must contain the following element:
 
@@ -219,19 +262,19 @@ Here is a non-normative example:
    }
 }
 ```
-### Requesting a VP Token
+### VP Token
 
 A VP Token is requested by adding a new top level element `vp_token` to the `claims` parameter. This element contains the sub elements as defined above.
 
-##  Examples 
+#  Examples 
 
 This section illustrates examples when W3C Verifiable Credentials objects are requested using `claims` parameter and returned inside ID Tokens.
 
-### Self-Issued OpenID Provider with Verifiable Presentation in ID Token 
+## Self-Issued OpenID Provider with Verifiable Presentation in ID Token 
 
 Below are the examples when W3C Verifiable Credentials are requested and returned inside ID Token as part of Self-Issued OP response. ID Token contains a `verifiable_presentations` claim with the Verifiable Presentation data. It can also contain `verifiable_credentials` element with the Verifiable Credential data. 
 
-#### Authentication request
+### Authentication request
 
 The following is a non-normative example of how an RP would use the `claims` parameter to request the `verifiable_presentations` claim in the `id_token`:
 
@@ -269,7 +312,7 @@ Below is a non-normative example of how the `claims` parameter can be used for r
    }
 }
 ```
-#### Authentication Response 
+### Authentication Response 
 
 Below is a non-normative example of ID Token that includes `verifiable_presentations` claim.
 
@@ -327,8 +370,8 @@ Note that `vp` is used to contain only "those parts of the standard verifiable p
     }   
   }
 ```
-### Self-Issued OpenID Provider with Verifiable Presentation in ID Token (selective disclosure)
-#### `claims` parameter 
+## Self-Issued OpenID Provider with Verifiable Presentation in ID Token (selective disclosure)
+### `claims` parameter 
 
 Below is a non-normative example of how the `claims` parameter can be used for requesting verified presentations signed as Linked Data Proofs.
 
@@ -350,8 +393,7 @@ Below is a non-normative example of how the `claims` parameter can be used for r
    }
 }
 ```
-
-#### Authentication Response 
+### Authentication Response 
 
 Below is a non-normative example of ID Token that includes `verifiable_presentations` claim.
 
@@ -424,12 +466,11 @@ Below is a non-normative example of ID Token that includes `verifiable_presentat
    }
 }
 ```
-
-### Authorization Code Flow with Verifiable Presentation in ID Token
+## Authorization Code Flow with Verifiable Presentation in ID Token
 
 Below are the examples when W3C Verifiable Credentials are requested and returned inside ID Token as part of Authorization Code flow. ID Token contains a `verifiable_presentations` element with the Verifiable Presentations data. 
 
-#### Authentication Request
+### Authentication Request
 
 ```
   GET /authorize?
@@ -442,7 +483,6 @@ Below are the examples when W3C Verifiable Credentials are requested and returne
     &nonce=n-0S6_WzA2Mj HTTP/1.1
   Host: server.example.com
 ```
-
 #### Claims parameter 
 
 Below is a non-normative example of how the `claims` parameter can be used for requesting verified presentations signed as JWT.
@@ -461,8 +501,7 @@ Below is a non-normative example of how the `claims` parameter can be used for r
    }
 }
 ```
-
-#### Authentication Response
+### Authentication Response
 
 ```
 HTTP/1.1 302 Found
@@ -471,7 +510,7 @@ HTTP/1.1 302 Found
     &state=af0ifjsldkj
 ```
 
-#### Token Request
+### Token Request
 
 ```
   POST /token HTTP/1.1
@@ -483,12 +522,11 @@ HTTP/1.1 302 Found
   &code=SplxlOBeZQQYbYS6WxSbIA
   &redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb
 ```
-
-### Authorization Code Flow with Verifiable Presentation returned from the UserInfo endpoint
+## Authorization Code Flow with Verifiable Presentation returned from the UserInfo endpoint
 
 Below are the examples when verifiable presentation is requested and returned from the UserInfo endpoint as part of OpenID Connect Authorization Code Flow. UserInfo response contains a `verifiable_presentations` element with the Verifiable Presentation data. 
 
-#### Authentication Request
+### Authentication Request
 
 ```
   GET /authorize?
@@ -524,8 +562,7 @@ Below is a non-normative example of how the `claims` parameter can be used for r
    }
 }
 ```
-
-#### Authentication Response
+### Authentication Response
 
 ```
 HTTP/1.1 302 Found
@@ -534,7 +571,7 @@ HTTP/1.1 302 Found
     &state=af0ifjsldkj
 ```
 
-#### Token Request
+### Token Request
 
 ```
   POST /token HTTP/1.1
@@ -546,10 +583,9 @@ HTTP/1.1 302 Found
   &code=SplxlOBeZQQYbYS6WxSbIA
   &redirect_uri=https%3A%2F%2Fclient.example.org%2Fcb
 ```
+### Token Response
 
-#### Token Response
-
-##### id_token
+#### id_token
 
 ```json
 {
@@ -562,8 +598,7 @@ HTTP/1.1 302 Found
   "auth_time": 1615910535
 }
 ```
-
-##### UserInfo Response 
+### UserInfo Response 
 
 Below is a non-normative example of a UserInfo Response that includes a `verifiable_presentations` claim:
 
@@ -587,8 +622,8 @@ Below is a non-normative example of a UserInfo Response that includes a `verifia
 
 JWT inside the `verifiable_presentations` claim when decoded equals to a verifiable presentation in Self-Issued OP with Verifiable Presentation in ID Token, Authentication Response section.
 
-### Authorization Code Flow with Verifiable Presentation returned from the UserInfo endpoint (LDP)
-#### Claims parameter 
+## Authorization Code Flow with Verifiable Presentation returned from the UserInfo endpoint (LDP)
+### Claims parameter 
 
 Below is a non-normative example of how the `claims` parameter can be used for requesting verified presentations signed as Linked Data Proofs.
 
@@ -615,7 +650,7 @@ Below is a non-normative example of how the `claims` parameter can be used for r
    }
 }
 ```
-#### Token Response
+### Token Response
 
 #### id_token
 
@@ -630,8 +665,7 @@ Below is a non-normative example of how the `claims` parameter can be used for r
   "auth_time": 1615910535
 }
 ```
-
-#### UserInfo Response 
+### UserInfo Response 
 
 Below is a non-normative example of a UserInfo Response that includes `verifiable_presentations` claim:
 
@@ -698,7 +732,6 @@ Below is a non-normative example of a UserInfo Response that includes `verifiabl
    ]
 }
 ```
-
 ## SIOP with vp_token
 This section illustrates the protocol flow for the case of communication through the front channel only (like in SIOP).
 
@@ -720,7 +753,6 @@ The following is a non-normative example of how an RP would use the `claims` par
       client.example.org%2Frf.txt%22%7D
       
 ```
-
 #### claims parameter
 
 ```json
@@ -739,7 +771,6 @@ The following is a non-normative example of how an RP would use the `claims` par
    }
 }
 ```
-
 ### Authentication Response (including vp_token)
 
 The successful authentication response contains a `vp_token` parameter along with  `id_token` and `state`.
@@ -751,7 +782,6 @@ The successful authentication response contains a `vp_token` parameter along wit
     &state=af0ifjsldkj
       
 ```
-
 #### id_token
 
 This example shows an ID Token containing a `vp_hash`:
@@ -778,7 +808,6 @@ This example shows an ID Token containing a `vp_hash`:
    }
 }
 ```
-
 #### vp_token content
 
 ```json
@@ -835,7 +864,6 @@ This example shows an ID Token containing a `vp_hash`:
    }
 ]
 ```
-
 ## Authorization Code Flow with vp_token
 
 This section illustrates the protocol flow for the case of communication using frontchannel and backchannel (utilizing the authorization code flow).
@@ -956,7 +984,6 @@ HTTP/1.1 302 Found
    ]
 }
 ```
-
 #### id_token
 
 ```json
@@ -971,5 +998,65 @@ HTTP/1.1 302 Found
 }
 ``` 
 
-### Related Issues
+{backmatter}
+
+<reference anchor="OpenID" target="http://openid.net/specs/openid-connect-core-1_0.html">
+  <front>
+    <title>OpenID Connect Core 1.0 incorporating errata set 1</title>
+    <author initials="N." surname="Sakimura" fullname="Nat Sakimura">
+      <organization>NRI</organization>
+    </author>
+    <author initials="J." surname="Bradley" fullname="John Bradley">
+      <organization>Ping Identity</organization>
+    </author>
+    <author initials="M." surname="Jones" fullname="Mike Jones">
+      <organization>Microsoft</organization>
+    </author>
+    <author initials="B." surname="de Medeiros" fullname="Breno de Medeiros">
+      <organization>Google</organization>
+    </author>
+    <author initials="C." surname="Mortimore" fullname="Chuck Mortimore">
+      <organization>Salesforce</organization>
+    </author>
+   <date day="8" month="Nov" year="2014"/>
+  </front>
+</reference>
+
+<reference anchor="OpenID.Registration" target="https://openid.net/specs/openid-connect-registration-1_0.html">
+        <front>
+          <title>OpenID Connect Dynamic Client Registration 1.0 incorporating errata set 1</title>
+		  <author fullname="Nat Sakimura">
+            <organization>NRI</organization>
+          </author>
+          <author fullname="John Bradley">
+            <organization>Ping Identity</organization>
+          </author>
+          <author fullname="Mike Jones">
+            <organization>Microsoft</organization>
+          </author>
+          <date day="8" month="Nov" year="2014"/>
+        </front>
+ </reference>
+
+# IANA Considerations
+
+TBD
+
+# Acknowledgements {#Acknowledgements}
+
+TBD
+
+# Notices
+
+TBD
+
+# Document History
+
+   [[ To be removed from the final specification ]]
+
+   -00 
+
+   *  initial revision
+
+# Related Issues
 - https://bitbucket.org/openid/connect/issues/1206/how-to-support-ld-proofs-in-verifiable#comment-60051830
