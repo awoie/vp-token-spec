@@ -125,7 +125,7 @@ Here is an example:
 
 A verifiable credential container is an array of objects, each of them containing the following fields:
 
-`format`: REQUIRED A JSON string denoting the proof format the presentation was returned in. This specification introduces the values `w3cvc-jsonld` and `w3cvc-jwt` to denote credentials in JSON-LD and JWT format, respectively.  
+`format`: REQUIRED A JSON string denoting the proof format the presentation was returned in. This specification introduces the values `jwt_vp` and `ldp_vp` to denote credentials in JSON-LD and JWT format, respectively.  
 
 `presentation` : REQUIRED. A cryptographically verifiable proof in the defined proof format. 
 
@@ -136,7 +136,7 @@ Here is an example:
 ```json
 [
    {
-      "format":"w3cvc-ldp",
+      "format":"vp_ldp",
       "presentation":{
          "@context":[
             "https://www.w3.org/2018/credentials/v1"
@@ -232,7 +232,7 @@ Object array containing definitions of credential types the RP wants to obtain a
 
 * `type` REQUIRED String denoting a credential type
 * `claims` OPTIONAL An object determining the claims the RP wants to obtain using the same notation as used underneath `id_token`. 
-* `format` OPTION String designating the VP format. Predefined values are `w3cvp-jsonld` and `w3cvp-jwt`. 
+* `format` OPTION String designating the VP format. Predefined values are `vp_ldp` and `vp_jwt`. 
 
 Here is a non-normative example: 
 
@@ -332,7 +332,7 @@ Below is a non-normative example of ID Token that includes `verifiable_presentat
    "nonce":"960848874",
    "verifiable_presentations":[
       {
-         "format":"w3cvp-jwt",
+         "format":"vp_jwt",
          "presentation":"ewogICAgImlzcyI6Imh0dHBzOi8vYm9vay5pdHNvdXJ3ZWIub...IH0="
       }
    ],   
@@ -409,7 +409,7 @@ Below is a non-normative example of ID Token that includes `verifiable_presentat
    "auth_time":1615910535,
    "verifiable_presentations":[
       {
-         "format":"w3cvp-jwt",
+         "format":"vp_jwt",
          "presentation":{
             "@context":[
                "https://www.w3.org/2018/credentials/v1"
@@ -622,7 +622,7 @@ Below is a non-normative example of a UserInfo Response that includes a `verifia
    "family_name": "Doe",
     "verifiable_presentations":[
       {
-         "format":"w3cvp-jwt",
+         "format":"vp_jwt",
          "presentation":"ewogICAgImlzcyI6Imh0dHBzOi8vYm9vay5pdHNvdXJ3ZWIub...IH0="
       }
    ],   
@@ -690,7 +690,7 @@ Below is a non-normative example of a UserInfo Response that includes `verifiabl
    "family_name":"Doe",
    "verifiable_presentations":[
       {
-         "format":"w3cvp-jwt",
+         "format":"vp_jwt",
          "presentation":{
             "@context":[
                "https://www.w3.org/2018/credentials/v1"
@@ -828,7 +828,7 @@ This example shows an ID Token containing a `vp_hash`:
 ```json
 [
    {
-      "format":"w3cvp-ldp",
+      "format":"vp_ldp",
       "presentation":{
          "@context":[
             "https://www.w3.org/2018/credentials/v1"
@@ -948,7 +948,7 @@ HTTP/1.1 302 Found
    "id_token":"eyJ0 ... NiJ9.eyJ1c ... I6IjIifX0.DeWt4Qu ... ZXso",
    "vp_token":[
       {
-         "format":"w3cvp-ldp",
+         "format":"vp_ldp",
          "presentation":{
             "@context":[
                "https://www.w3.org/2018/credentials/v1"
