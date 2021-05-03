@@ -273,7 +273,7 @@ This section illustrates examples when W3C Verifiable Credentials objects are re
 
 ### Self-Issued OpenID Provider with Verifiable Presentation in ID Token 
 
-Below are the examples when W3C Verifiable Credentials are requested and returned inside ID Token as part of Self-Issued OP response. ID Token contains a `verifiable_presentations` claim with the Verifiable Presentations data. It can also contain `verifiable_credentials` element with the Verifiable Credentials data. 
+Below are the examples when W3C Verifiable Credentials are requested and returned inside ID Token as part of Self-Issued OP response. ID Token contains a `verifiable_presentations` claim with the Verifiable Presentation data. It can also contain `verifiable_credentials` element with the Verifiable Credential data. 
 
 #### Authentication request
 
