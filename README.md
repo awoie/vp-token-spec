@@ -123,7 +123,7 @@ Here is an example:
 
 ### Verifiable Presentation
 
-A verifiable credential container is an array of objects, each of them containing the following fields:
+A verifiable presentation container is an array of objects, each of them containing the following fields:
 
 `format`: REQUIRED A JSON string denoting the proof format the presentation was returned in. This specification introduces the values `w3cvc-jsonld` and `w3cvc-jwt` to denote credentials in JSON-LD and JWT format, respectively.  
 
