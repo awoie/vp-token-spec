@@ -125,7 +125,7 @@ Here is an example:
 
 A verifiable credential container is an array of objects, each of them containing the following fields:
 
-`format`: REQUIRED A JSON string denoting the proof format the presentation was returned in. This specification introduces the values `jwt_vp` and `ldp_vp` to denote credentials in JSON-LD and JWT format, respectively.  
+`format`: REQUIRED A JSON string denoting the proof format the presentation was returned in. This specification introduces the values `jwt_vp` and `ldp_vp` to denote credentials in JSON-LD and JWT format, respectively, as defined in https://identity.foundation/presentation-exchange/.  
 
 `presentation` : REQUIRED. A cryptographically verifiable proof in the defined proof format. 
 
