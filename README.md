@@ -91,7 +91,7 @@ A verifiable credential container is an array of objects, each of them containin
 
 `format`: REQUIRED A JSON string denoting the proof format the credential was returned in. This specification introduces the values `w3cvc-jsonld` and `w3cvc-jwt` to denote credentials in JSON-LD and JWT format, respectively.  
 
-`credential` : REQUIRED. A cryptographically verifiable proof in the defined proof format. 
+`credential` : REQUIRED. A W3C Verifiable Credential with a cryptographically verifiable proof in the defined proof format.
 
 Note that OP would first encode VCs using the rules defined in the Verifiable Credential specification either in JWT format or JSON-LD format, before encoded VCs as container objects.
 
