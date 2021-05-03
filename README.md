@@ -127,7 +127,7 @@ A verifiable presentation container is an array of objects, each of them contain
 
 `format`: REQUIRED A JSON string denoting the proof format the presentation was returned in. This specification introduces the values `w3cvc-jsonld` and `w3cvc-jwt` to denote credentials in JSON-LD and JWT format, respectively.  
 
-`presentation` : REQUIRED. A cryptographically verifiable proof in the defined proof format. 
+`presentation` : REQUIRED. A W3C Verifiable Presentation with a cryptographically verifiable proof in the defined proof format. 
 
 Note that OP would first encode VPs using the rules defined in the Verifiable Credential specification either in JWT format or JSON-LD format, before encoded VPs as container objects.
 
