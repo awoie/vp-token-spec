@@ -530,7 +530,7 @@ HTTP/1.1 302 Found
 
 ### Authorization Code Flow with Verifiable Presentation returned from the UserInfo endpoint
 
-Below are the examples when verifiable presentation is requested and returned from the UserInfo endpoint as part of OpenID Connect Authorization Code Flow. UserInfo response contains a `verifiable_presentazions` element with the Verifiable Presentation data. It can also contain `verifiable_credentials` element with the Verifiable Credentials data. 
+Below are the examples when verifiable presentation is requested and returned from the UserInfo endpoint as part of OpenID Connect Authorization Code Flow. UserInfo response contains a `verifiable_presentations` element with the Verifiable Presentation data. It can also contain `verifiable_credentials` element with the Verifiable Credentials data. 
 
 #### Authentication Request
 
