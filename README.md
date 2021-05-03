@@ -100,7 +100,7 @@ Here is an example:
 ```json
 [
    {
-      "format":"w3cvc-jwt",
+      "format":"jwt_vc",
       "credential":
       "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImRpZDpleGFtcGxlOmFiZmUxM2Y3MTIxMjA0
       MzFjMjc2ZTEyZWNhYiNrZXlzLTEifQ.eyJzdWIiOiJkaWQ6ZXhhbXBsZTplYmZlYjFmNzEyZWJjNmYxY
